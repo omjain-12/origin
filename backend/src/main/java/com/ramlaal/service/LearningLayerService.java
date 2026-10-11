@@ -3,12 +3,11 @@ package com.ramlaal.service;
 import com.ramlaal.domain.entity.UserMemory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.azure.openai.AzureOpenAiChatModel;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,7 +16,7 @@ import java.util.regex.Pattern;
 @Slf4j
 public class LearningLayerService {
 
-    private final AzureOpenAiChatModel chatModel;
+    private final ChatModel chatModel;
     private final UserMemoryService userMemoryService;
 
     private static final String EXTRACTION_PROMPT = """

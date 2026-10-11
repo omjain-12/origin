@@ -13,3 +13,4 @@ public interface ReminderItemRepository extends JpaRepository<ReminderItem, UUID
     List<ReminderItem> findByUserIdAndFiredFalseOrderByRemindAtAsc(String userId);
     List<ReminderItem> findByFiredFalseAndRemindAtBefore(Instant now);
 }
+

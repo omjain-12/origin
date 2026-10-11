@@ -69,3 +69,4 @@ public class VectorRetrievalService {
         return sb.toString();
     }
 }
+

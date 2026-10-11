@@ -35,3 +35,4 @@ public class ChatSession {
     @UpdateTimestamp
     private Instant updatedAt;
 }
+

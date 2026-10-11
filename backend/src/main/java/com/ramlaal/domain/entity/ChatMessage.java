@@ -34,3 +34,4 @@ public class ChatMessage {
 
     public enum Role { USER, ASSISTANT, TOOL }
 }
+

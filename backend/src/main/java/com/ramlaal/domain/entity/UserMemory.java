@@ -40,3 +40,4 @@ public class UserMemory {
     @UpdateTimestamp
     private Instant updatedAt;
 }
+

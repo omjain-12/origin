@@ -46,3 +46,4 @@ public class ScheduledJobItem {
 
     public enum Status { ACTIVE, PAUSED, CANCELLED }
 }
+

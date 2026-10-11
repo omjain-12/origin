@@ -111,3 +111,4 @@ public class DocumentIngestionService {
         return lower.endsWith(".txt") || lower.endsWith(".md");
     }
 }
+

@@ -32,3 +32,4 @@ public class AlarmItem {
     @CreationTimestamp
     private Instant createdAt;
 }
+

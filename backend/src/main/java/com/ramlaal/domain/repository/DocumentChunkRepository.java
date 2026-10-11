@@ -23,3 +23,4 @@ public interface DocumentChunkRepository extends JpaRepository<DocumentChunk, UU
         @Param("k") int k
     );
 }
+

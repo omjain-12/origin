@@ -37,3 +37,4 @@ public class Document {
 
     public enum IngestionStatus { PENDING, PROCESSING, COMPLETED, FAILED }
 }
+

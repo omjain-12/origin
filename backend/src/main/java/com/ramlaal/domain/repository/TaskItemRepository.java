@@ -13,3 +13,4 @@ public interface TaskItemRepository extends JpaRepository<TaskItem, UUID> {
         String userId, TaskItem.Status status
     );
 }
+

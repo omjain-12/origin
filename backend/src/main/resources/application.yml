@@ -17,26 +17,23 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
 
+  # ── Spring AI: OpenAI-compatible (AWS Bedrock Mantle) ─────────────────────
   ai:
-    azure:
-      openai:
-        api-key: ${AZURE_OPENAI_API_KEY}
-        endpoint: ${AZURE_OPENAI_ENDPOINT}
-        chat:
-          options:
-            deployment-name: ${AZURE_OPENAI_CHAT_DEPLOYMENT:gpt-4o}
-            temperature: 0.7
-        embedding:
-          options:
-            deployment-name: ${AZURE_OPENAI_EMBEDDING_DEPLOYMENT:text-embedding-3-small}
+    openai:
+      api-key: ${API_KEY}
+      base-url: ${BASE_URL:https://bedrock-mantle.us-east-1.api.aws/v1}
+      chat:
+        options:
+          model: ${CHAT_MODEL:openai/zai.glm-5}
+          temperature: 0.7
+      embedding:
+        options:
+          model: ${EMBEDDING_MODEL:openai/zai.glm-4.7}
 
   servlet:
     multipart:
       max-file-size: 50MB
       max-request-size: 50MB
-
-  scheduling:
-    enabled: true
 
 server:
   port: 8080
@@ -55,3 +52,7 @@ ramlaal:
     chunk-overlap: 50
   memory:
     user-id: default-user
+  models:
+    planning: ${PLANNING_MODELS:openai/zai.glm-5}
+    fast: ${FAST_CHAT_MODEL:openai/zai.glm-4.7-flash}
+    full: ${EXECUTION_MODELS_FULL:openai/zai.glm-5}

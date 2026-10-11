@@ -27,3 +27,4 @@ public interface UserMemoryRepository extends JpaRepository<UserMemory, UUID> {
         @Param("k") int k
     );
 }
+

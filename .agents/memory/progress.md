@@ -1,41 +1,30 @@
 # Project Progress: RamLaal
 
-## Current Status: Phase 0 (AI Scaffolding & Setup)
+## Current Status: Backend Complete (Phases 0–6) — Awaiting Credentials & Frontend
 
-### Completed
-- [x] Initial exploration and reference analysis (`refrence_chatgpt_response.txt`).
-- [x] Master AI guidelines created (`AGENTS.md`, `GEMINI.md`).
-- [x] Cross-agent IDE configurations set (`.cursorrules`, `CLAUDE.md`).
-- [x] Hierarchical rules established (`.agents/rules/`).
-- [x] Persistent Memory Bank created (`.agents/memory/`).
-  - [x] `projectbrief.md`
-  - [x] `activeContext.md`
-  - [x] `systemPatterns.md`
-  - [x] `techContext.md`
-  - [x] `progress.md`
+### ✅ Completed
+- [x] AI agent guidelines, rules, memory bank, skills (`.agents/`).
+- [x] **Phase 0** — Git init, `.gitignore`, `.env.example`, `docker-compose.yml`.
+- [x] **Phase 1** — Maven `backend/pom.xml` (Spring Boot 3.3.4, Spring AI 1.0.0 BOM, pgvector 0.1.6, Lombok).
+- [x] **Phase 2** — All JPA entities (10) and Spring Data repositories (9) with native pgvector queries.
+  - `ChatSession`, `ChatMessage`, `UserMemory`, `Document`, `DocumentChunk`
+  - `CalendarEvent`, `TaskItem`, `ReminderItem`, `AlarmItem`, `ScheduledJobItem`
+- [x] **Phase 3** — 5 Spring AI `@Tool` components + `BackgroundNotificationDispatcher` (30s polling).
+  - `CalendarTool`, `TaskTool`, `ReminderTool`, `AlarmTool`, `SchedulerTool`
+- [x] **Phase 4** — `QueryExpansionService`, `DocumentIngestionService` (scan + upload), `VectorRetrievalService`.
+- [x] **Phase 5** — `UserMemoryService`, `LearningLayerService`.
+- [x] **Phase 6** — `AgentOrchestratorService` (full pipeline), 4 REST controllers.
+- [x] Initial git commit `350b0bb` — 70 files, 3135 insertions.
 
-### In Progress
-- [ ] Implement specialized workspace skills in `.agents/skills/`.
-- [ ] Configure `.agents/mcp_config.json` and `.agents/hooks.json`.
-- [ ] Setup `agent.empty` sentinels for directory anchors.
-
-### Roadmap & Backlog
-- [ ] **Phase 1: Project Skeleton & Build System**
-  - [ ] Finalize backend runtime selection (Java/Spring Boot vs Python/LangGraph).
-  - [ ] Initialize repository build configuration (`pom.xml` / `build.gradle` or `pyproject.toml`).
-  - [ ] Configure Docker Compose for PostgreSQL + pgvector.
-- [ ] **Phase 2: Core Tool Engine**
-  - [ ] Define abstract Tool interface and schemas.
-  - [ ] Implement Task/Todo CRUD tool.
-  - [ ] Implement Calendar tool with timezone validation.
-  - [ ] Implement Reminders & Alarms with persistent scheduler.
-- [ ] **Phase 3: Agent Workflow & Orchestration**
-  - [ ] Intent classification and query routing.
-  - [ ] LLM tool calling and execution loop.
-  - [ ] Safety checkpoints for modifying/deleting operations.
-- [ ] **Phase 4: Retrieval & Memory Layer**
-  - [ ] Document ingestion pipeline with chunking and embeddings.
-  - [ ] Hybrid search (Dense vector + BM25) and reranking.
-  - [ ] Learning layer: extracting durable memories from interactions.
-- [ ] **Phase 5: User Interface & Polish**
-  - [ ] Web dashboard with chat, calendar view, task manager, and memory inspector.
+### 🔜 Pending
+- [ ] User provides Azure OpenAI credentials → copy `.env.example` to `.env`.
+- [ ] `docker-compose up -d` → verify PostgreSQL + pgvector.
+- [ ] `mvn spring-boot:run` → verify startup and DB schema.
+- [ ] **Phase 7** — React 18 + Vite + TypeScript + Tailwind CSS frontend.
+  - Chat panel with streaming and tool call callouts.
+  - Productivity Dashboard (Calendar, Tasks, Reminders, Alarms).
+  - Memory Inspector.
+- [ ] **Phase 8** — End-to-end verification walkthrough.
+  - Run `mvn test` suite.
+  - Execute multi-turn scenario prompt.
+  - Verify DB records in `calendar_events`, `reminder_items`, `user_memories`.

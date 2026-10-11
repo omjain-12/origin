@@ -6,8 +6,10 @@ import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest
 @TestPropertySource(properties = {
-    "AZURE_OPENAI_API_KEY=test-key",
-    "AZURE_OPENAI_ENDPOINT=https://test.openai.azure.com/",
+    "API_KEY=test-key",
+    "BASE_URL=https://bedrock-mantle.us-east-1.api.aws/v1",
+    "CHAT_MODEL=openai/zai.glm-5",
+    "EMBEDDING_MODEL=openai/zai.glm-4.7",
     "spring.jpa.hibernate.ddl-auto=none",
     "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration"
 })

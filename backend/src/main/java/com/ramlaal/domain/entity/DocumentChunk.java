@@ -30,3 +30,4 @@ public class DocumentChunk {
     @Column(columnDefinition = "vector(1536)")
     private float[] embedding;
 }
+

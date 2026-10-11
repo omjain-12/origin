@@ -13,3 +13,4 @@ public interface ScheduledJobItemRepository extends JpaRepository<ScheduledJobIt
         String userId, ScheduledJobItem.Status status
     );
 }
+

@@ -1,27 +1,24 @@
 # Active Context: RamLaal
 
 ## Current State & Focus
-- **Current Phase**: AI Infrastructure & Scaffolding Initialization.
-- **Active Task**: Setting up the complete multi-AI agent configuration, memory bank, rules, skills, and MCP structure.
-- **Recent Progress**:
-  - Initialized master agent guidelines: `AGENTS.md` and `GEMINI.md`.
-  - Configured multi-agent IDE compatibility files (`.cursorrules`, `CLAUDE.md`).
-  - Created modular `.agents/rules/` for core behaviors, architecture, memory bank protocol, and coding standards.
-  - Initialized `.agents/memory/` persistent memory bank documents.
-  - Researched and verified top open-source repositories matching the exact 6-node agentic workflow (LangGraph, Jarvis AI Platform, Khoj, Mem0, Letta).
-  - Created master `PROJECT_PLAN.md` with verified 8-phase execution plan.
-  - Authored comprehensive `IMPLEMENTATION_PROMPT.md` for AI agent handoff and autonomous execution.
+- **Current Phase**: Phase 3 Complete → Ready for Phase 7 (Frontend) after credentials.
+- **Active Task**: Awaiting Azure OpenAI credentials from user before running live tool tests.
+- **Recent Progress (this session)**:
+  - ✅ **Phase 0** — Git init, `.gitignore`, `.env.example`, `docker-compose.yml` (pgvector/pgvector:pg16).
+  - ✅ **Phase 1** — Maven `backend/` scaffold with `pom.xml` (Spring Boot 3.3.4, Spring AI 1.0.0 BOM, pgvector, Lombok).
+  - ✅ **Phase 2** — All JPA entities + repositories with native pgvector queries.
+  - ✅ **Phase 3** — All 5 Spring AI `@Tool` components + BackgroundNotificationDispatcher.
+  - ✅ **Phases 4-6** — QueryExpansionService, VectorRetrievalService, DocumentIngestionService, UserMemoryService, LearningLayerService, AgentOrchestratorService.
+  - ✅ REST controllers: ChatController, DashboardController, MemoryController, DocumentController.
+  - ✅ Initial git commit: `350b0bb` — 70 files, 3135 insertions.
 
-## Active Decisions & Considerations
-- **Confirmed Tech Stack**:
-  - Backend: Java 21, Spring Boot 3.3+, Spring AI 1.0+ (`spring-ai-azure-openai-spring-boot-starter`).
-  - Database: PostgreSQL 16 with `pgvector` via `docker-compose.yml`.
-  - Tools Execution: Internal database persistence with Spring persistent scheduler.
-  - RAG Ingestion: Hybrid (auto-scan `./data/documents` + React UI upload).
-  - Build & Monorepo: Maven with `backend/` and `frontend/` (React + Vite + Tailwind CSS).
+## Active Decisions
+- Spring AI 1.0.0 GA used for stable API.
+- word-based chunking (configurable via `ramlaal.retrieval.chunk-size/overlap`).
+- `ramlaal.memory.user-id=default-user` — single-user mode.
 
 ## Immediate Next Steps
-1. Execute Phase 1: Create `docker-compose.yml` for PostgreSQL + `pgvector`.
-2. Scaffold `backend/` Spring Boot project with Maven and required Spring AI starters.
-3. Configure Azure OpenAI connection in `application.yml`.
-4. Scaffold `frontend/` React Vite application.
+1. **User provides Azure OpenAI credentials** → copy `.env.example` to `.env`, fill values.
+2. Start `docker-compose up -d` to boot PostgreSQL.
+3. Run `mvn spring-boot:run` in `backend/` and verify startup.
+4. Phase 7: Scaffold `frontend/` with Vite + React + TypeScript + Tailwind CSS.

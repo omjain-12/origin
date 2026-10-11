@@ -55,10 +55,10 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Spring AI – Azure OpenAI -->
+        <!-- Spring AI – OpenAI-compatible (Bedrock Mantle / ZAI GLM) -->
         <dependency>
             <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-azure-openai-spring-boot-starter</artifactId>
+            <artifactId>spring-ai-openai-spring-boot-starter</artifactId>
         </dependency>
 
         <!-- PostgreSQL + pgvector -->
@@ -114,3 +114,4 @@
         </plugins>
     </build>
 </project>
+

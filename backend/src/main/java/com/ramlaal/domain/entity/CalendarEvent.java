@@ -38,3 +38,4 @@ public class CalendarEvent {
     @CreationTimestamp
     private Instant createdAt;
 }
+

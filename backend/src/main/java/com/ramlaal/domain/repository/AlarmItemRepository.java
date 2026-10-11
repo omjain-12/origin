@@ -13,3 +13,4 @@ public interface AlarmItemRepository extends JpaRepository<AlarmItem, UUID> {
     List<AlarmItem> findByUserIdAndDismissedFalseOrderByTriggerAtAsc(String userId);
     List<AlarmItem> findByDismissedFalseAndTriggerAtBefore(Instant now);
 }
+

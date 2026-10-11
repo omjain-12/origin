@@ -12,3 +12,4 @@ public class RamLaalApplication {
         SpringApplication.run(RamLaalApplication.class, args);
     }
 }
+

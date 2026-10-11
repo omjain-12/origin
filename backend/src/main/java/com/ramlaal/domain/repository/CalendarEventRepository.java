@@ -12,3 +12,4 @@ import java.util.UUID;
 public interface CalendarEventRepository extends JpaRepository<CalendarEvent, UUID> {
     List<CalendarEvent> findByUserIdAndStartTimeAfterOrderByStartTimeAsc(String userId, Instant after);
 }
+

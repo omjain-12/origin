@@ -2,7 +2,7 @@ package com.ramlaal.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.azure.openai.AzureOpenAiChatModel;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ import java.util.List;
 @Slf4j
 public class QueryExpansionService {
 
-    private final AzureOpenAiChatModel chatModel;
+    private final ChatModel chatModel;
 
     private static final String EXPANSION_PROMPT = """
         You are a query expansion assistant. Given the user's question below, produce exactly 3 alternative

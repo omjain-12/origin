@@ -45,3 +45,4 @@ public class TaskItem {
     public enum Priority { LOW, MEDIUM, HIGH, URGENT }
     public enum Status { PENDING, IN_PROGRESS, COMPLETED, CANCELLED }
 }
+
