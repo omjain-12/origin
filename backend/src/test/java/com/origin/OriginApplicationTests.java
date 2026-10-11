@@ -20,3 +20,4 @@ class OriginApplicationTests {
         // Smoke test: Spring context initializes without errors
     }
 }
+
