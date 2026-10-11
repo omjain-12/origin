@@ -1,0 +1,4 @@
+# AGENT.EMPTY - Workflow Anchor Sentinel
+
+This directory stores reusable agent workflows and operational runbooks.
+Add `.md` or `.sh` / `.ps1` workflow definitions here as the project evolves.

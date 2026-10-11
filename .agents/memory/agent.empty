@@ -1,0 +1,8 @@
+# AGENT.EMPTY - Agent Initialization Sentinel
+
+This file marks this directory as an active AI agent subsystem.
+
+Purpose:
+1. Serves as a directory anchor ensuring version control systems track this folder.
+2. Acts as an initialization sentinel indicating that the memory bank / agent store is loaded and ready.
+3. Provides a clean baseline for tools scanning for agent workspace directories.

@@ -1,0 +1,29 @@
+package com.ramlaal.api.controller;
+
+import com.ramlaal.domain.entity.UserMemory;
+import com.ramlaal.service.UserMemoryService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/api/memories")
+@RequiredArgsConstructor
+public class MemoryController {
+
+    private final UserMemoryService userMemoryService;
+
+    @GetMapping
+    public ResponseEntity<List<UserMemory>> getMemories() {
+        return ResponseEntity.ok(userMemoryService.getAllMemories());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteMemory(@PathVariable UUID id) {
+        userMemoryService.deleteMemory(id);
+        return ResponseEntity.noContent().build();
+    }
+}

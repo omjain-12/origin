@@ -1,0 +1,57 @@
+spring:
+  application:
+    name: ramlaal
+
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:ramlaal}
+    username: ${POSTGRES_USER:ramlaal}
+    password: ${POSTGRES_PASSWORD:ramlaal_secret}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  ai:
+    azure:
+      openai:
+        api-key: ${AZURE_OPENAI_API_KEY}
+        endpoint: ${AZURE_OPENAI_ENDPOINT}
+        chat:
+          options:
+            deployment-name: ${AZURE_OPENAI_CHAT_DEPLOYMENT:gpt-4o}
+            temperature: 0.7
+        embedding:
+          options:
+            deployment-name: ${AZURE_OPENAI_EMBEDDING_DEPLOYMENT:text-embedding-3-small}
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+  scheduling:
+    enabled: true
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.ramlaal: DEBUG
+    org.springframework.ai: INFO
+
+ramlaal:
+  documents:
+    scan-directory: ./data/documents
+  retrieval:
+    top-k: 5
+    chunk-size: 500
+    chunk-overlap: 50
+  memory:
+    user-id: default-user

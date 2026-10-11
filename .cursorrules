@@ -1,0 +1,16 @@
+# Cursor Rules for RamLaal
+
+You are an expert pair programmer working on the RamLaal assistant project.
+
+1. **Operating Rules**:
+   - Refer to `AGENTS.md` and `.agents/rules/*.md` for full project rules and coding standards.
+   - Always consult `.agents/memory/activeContext.md` before making changes.
+   - Update `.agents/memory/activeContext.md` and `.agents/memory/progress.md` upon completing work.
+
+2. **Architecture**:
+   - Maintain modular separation: API Layer, Retrieval Pipeline, Agent Orchestration, Tool Registry, and Memory Service.
+   - Ensure all tools (Calendar, Reminders, Alarms, Tasks) have strict JSON/Pydantic/DTO schemas with input validation.
+
+3. **Code Quality**:
+   - Write strongly-typed, clean, self-documenting code.
+   - Provide unit or integration tests for new modules and bugfixes.

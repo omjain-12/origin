@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json.schemastore.org/mcp-config.json",
+  "mcpServers": {
+    "postgres-db": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "postgresql://postgres:postgres@localhost:5432/ramlaal_db"],
+      "env": {}
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "d:/Codes/RamLaal"],
+      "env": {}
+    }
+  }
+}

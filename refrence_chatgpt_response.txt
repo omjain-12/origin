@@ -1,0 +1,276 @@
+# Best open-source starting points for your agentic AI assistant
+
+Your project is more than a standard RAG chatbot. It is a personal AI assistant with workflow orchestration, persistent memory, retrieval, and tool execution.
+
+The ideal existing project should already implement most of these components so that you can focus on improving the architecture rather than rebuilding the entire application.
+
+Your target architecture looks like this:
+
+1\. User Input + Conversation History
+
+Current message, previous chats, user profile
+
+2\. Query Understanding and Expansion
+
+Resolve references, rewrite queries, identify intent
+
+3\. Retrieval + Memory
+
+Relevant document chunks, personal facts, chat history
+
+4\. Agent Workflow / LLM
+
+Reasoning, routing, planning, tool selection
+
+Action tools
+
+Calendar, tasks, reminders, scheduler, alarms
+
+Learning layer
+
+Extract, update, and persist useful memories
+
+Conceptual architecture for your project, not a claim that any one repository implements every component.
+
+I looked for existing projects that combine chatbot functionality, RAG, agent workflows, tools, and persistent memory, while also considering your preference for Java/Spring Boot.
+
+## 1. Best matching repositories
+
+[Medium](https://images.openai.com/static-rsc-4/VhiLJuThplnWrQ_nszdoSwmzdB6icgsmcLhu1z2iL-Nb7e-mG6pYDUpdNPF03s-R87aFdD1w59MndoBpiIyQv8xhngsxBwQLBUYqgrT9tvzj8Nl36Jznm-Oa0OtlhZnRKzNNEnZ3u6n2l2NeY3TqGWQv6JlUfGqrWQHnqksWzsg?purpose=inline)
+
+Best overall feature match
+
+## 1. AI Personal Assistant — ai-rag-agent
+
+Python · FastAPI · LangGraph · React · SQLite/Supabase
+
+Repository: [nitintayal/ai-rag-agent](https://github.com/nitintayal/ai-rag-agent)
+
+This is the closest match to your complete feature list: chatbot, hybrid document retrieval, long-term user memory, task management, calendar operations, reminders, and multi-tool execution. It also includes a web interface and a persistent storage abstraction.&#x20;
+
+[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
+
+GitHub
+
++1
+
+
+
+Why it fits
+
+- Existing memory, RAG, and tool modules.
+- Task recurrence and due-date handling.
+- Local SQLite option, with Supabase as an alternative.
+- Document retrieval using FAISS, BM25, and reranking.
+
+  Main limitation: it uses Python, and its documented workflow may not implement your exact query-expansion and learning pipeline. Alarms and a generalized scheduler may require additional work.
+
+[Building a Tool Engine with Spring AI — How We Gave Jarvis the Ability to Act in the World - DEV Community](https://images.openai.com/static-rsc-4/yIE-SOMsLchNYeh6vRWzZh6GRYbpBfmrrG29dXz6k5aWXZG7Hj9J-zIpT51h-y2sd736KXGrypkHQX59fRWwMSSumHuMEqv9cakHROXb8EyFnwjc9hLY94JprEl3N6r9GxmIk-5STIgvCdp_kYRyYjr5xsAwnEvWG02Jb-IvNz0?purpose=inline)
+
+Best Java/Spring Boot candidate
+
+## 2. Jarvis AI Platform
+
+Java 21 · Spring Boot · Spring AI · Ollama · PostgreSQL/pgvector
+
+Repository: [sujankim/jarvis-ai-platform](https://github.com/sujankim/jarvis-ai-platform)
+
+This project describes a modular, local-first assistant with persistent memory, document RAG, a tool engine, and an agent planner/executor. Its architecture includes working memory, long-term memories, RAG context, and session history.&#x20;
+
+[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
+
+GitHub
+
+
+
+Why it fits
+
+- Keeps your primary backend in Java.
+- Separates orchestration, tools, memory, and retrieval.
+- Uses local models through Ollama, with a cloud-provider option.
+- Provides a starting point for multi-step task execution.
+
+  Main limitation: the documented tool set is relatively basic. You will need to inspect the implementation and add your calendar, reminder, alarm, and scheduler tools. Verify the current build and feature completeness before adopting it.
+
+[LangGraph: Building Stateful AI Agents as Graphs](https://images.openai.com/static-rsc-4/T4DVO2GUkAjWpif1geSDffR3BU6JxaEyJ06A2adVPDUvAZfJBP8jfYmP7dsqkgzJoSQasFKJf7Ku8DIw2B_VwTJrDR1rjlQ8i6ltTpth6RwEYFVLKCK3Ut3DjRqyIysL9DQ0X6C1DzgGjZqsT_yhzsBrQy5Zc6oA-zBEo3H6TGQ?purpose=inline)
+
+## 3. Personal AI OS
+
+Python · LangGraph · LangChain · Ollama · ChromaDB
+
+Repository: [KANDI-KANDI-ANAND/Personal_ai_os](https://github.com/KANDI-KANDI-ANAND/Personal_ai_os)
+
+This is a strong architectural reference because its repository explicitly separates routing, task planning, calendar actions, memory retrieval, memory saving, and conversational responses into workflow nodes.&#x20;
+
+[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
+
+GitHub
+
+
+
+Why it fits
+
+- An explicit graph-based workflow rather than only a chat endpoint.
+- Dedicated nodes for recalling and saving memories.
+- Tool orchestration and persistent vector-based memory.
+- A useful pattern for your retrieval → reasoning → action → learning flow.
+
+  Main limitation: the repository is small, and its documented features do not cover your full application. Treat it as a workflow reference rather than assuming it is production-ready.
+
+[GitHub - Brantin10/Jarvis---AI-Assistent: 3-tier dispatch (<0.5ms), dual LLM backends, 44-tool executor + safety layer, MCP windows, streaming voice pipeline, architecture diagram, full setup. Honest about 3 stub modes. · GitHub](https://images.openai.com/static-rsc-4/PlCDbOJJJ6a5YP0CBmnnufMeg85-Lucx51nOsxiGVJr0B8vUW3soTm7Z6LHxWmdThSUaeWLoGA91t7dBb_CNqIQbuSC2z8mf5InuI3PyVk6h0nk_936zOms1Ahs3HHG96d7JHXioPZcjzaBnnunHgL-bFxLhr1hV4_6CL3X29LU?purpose=inline)
+
+## 4. Jarvis — Personal AI Assistant
+
+Python · FastAPI · LangGraph · React
+
+Repository: [abdussk74/jarvis-ai-assistant](https://github.com/abdussk74/jarvis-ai-assistant)
+
+A more elaborate reference for a supervisor-agent architecture, with calendar, task/reminder, document, research, and memory agents. It also documents local document RAG, approval workflows, tracing, and persistent memory tiers.&#x20;
+
+[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
+
+GitHub
+
++1
+
+
+
+Main limitation: it is more complex than your initial requirements and uses a different backend stack. Some planned agent capabilities are explicitly incomplete, so check the actual code before reusing it.
+
+## 2. Java-specific alternatives
+
+If you want to stay with Java, two additional repositories are worth examining.
+
+[JavaClaw](https://github.com/nakame/java-claw)
+
+Spring Boot · Spring AI · JobRunr
+
+A Java personal assistant with task scheduling, recurring jobs, a chat interface, and MCP support. It is particularly relevant to your scheduler/task layer, although its documented feature set is not as directly focused on your full RAG and learning architecture.&#x20;
+
+[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
+
+GitHub
+
++1
+
+
+
+[ai-chatbot-spring](https://github.com/daoninhthai/ai-chatbot-spring)
+
+Spring Boot · Spring AI · React · PostgreSQL/pgvector
+
+A better starting point for the chatbot and document-RAG foundation: it documents streaming responses, conversation memory, document uploads, chunking, and vector search. You would need to build the orchestration and personal-assistant tools on top.&#x20;
+
+[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
+
+GitHub
+
+
+
+## 3. Feature-by-feature comparison
+
+This comparison reflects the repositories' documented features, not an independent audit of every implementation.
+
+| Capability              | ai-rag-agent            | Jarvis AI Platform (Java) | Personal AI OS               | Jarvis Assistant        |
+| ----------------------- | ----------------------- | ------------------------- | ---------------------------- | ----------------------- |
+| Chatbot                 | Yes                     | Yes                       | Yes                          | Yes                     |
+| Document RAG            | Yes                     | Yes                       | Memory-focused RAG           | Yes                     |
+| Persistent user memory  | Yes                     | Yes                       | Yes                          | Yes                     |
+| Agent workflow          | LangGraph               | Agent planner/executor    | LangGraph                    | Supervisor graph        |
+| Tool execution          | Yes                     | Yes                       | Yes                          | Yes                     |
+| Tasks and reminders     | Yes                     | Basic tool foundation     | Some orchestration           | Yes                     |
+| Calendar                | Yes                     | Extend as needed          | Yes                          | Yes                     |
+| Query expansion         | Verify/add              | Verify/add                | Query clarification patterns | Verify/add              |
+| Learning/memory updates | Existing memory modules | Existing memory system    | Explicit save-memory node    | Memory tiers and review |
+| Java backend            | No                      | Yes                       | No                           | No                      |
+
+## 4. My recommendation
+
+Given that your priority is to reuse an existing project, rather than build everything from scratch, I would narrow your choice to two.
+
+Option A — Start with ai-rag-agent
+
+Choose this if minimizing development time is your main priority. It already combines most of the application-level features you described, including persistent memory, document retrieval, tasks, reminders, and calendar APIs. You can retain the existing frontend and progressively replace or refactor components.
+
+Option B — Start with Jarvis AI Platform
+
+Choose this if Java/Spring Boot is a firm requirement. Its documented separation of orchestration, memory, retrieval, and tools is closer to the architecture you want. Expect to implement and test more of the personal productivity functionality yourself.
+
+One important distinction: your learning layer should not simply save every conversation into the vector database. It should identify durable facts, preferences, and relevant updates, then persist those selectively. Both conversation history and long-term user memory need separate treatment.
+
+## 5. Recommended architecture if you choose Java
+
+You do not need to invent a Java agent framework. The official Spring AI project already supports chat clients, persistent conversation memory, RAG, tool calling, and MCP integrations.&#x20;
+
+[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
+
+GitHub
+
++1
+
+
+
+Repository: [spring-projects/spring-ai](https://github.com/spring-projects/spring-ai)
+
+I would organize your application as follows:
+
+01
+
+API and conversation manager
+
+Authentication, session IDs, current message, recent chat history
+
+02
+
+Context and retrieval pipeline
+
+Query rewriting, user-memory retrieval, document search, reranking
+
+03
+
+Agent orchestrator
+
+Intent routing, planning, tool selection, execution and retry logic
+
+04
+
+Tool registry
+
+Calendar, scheduler, reminders, alarms and task CRUD
+
+05
+
+Memory and learning service
+
+Extract candidate memories, deduplicate, update, persist and retrieve
+
+06
+
+Storage and background jobs
+
+PostgreSQL + pgvector, chat history, task tables, scheduled job execution
+
+Suggested stack:
+
+- Backend: Java 21+ and a compatible Spring Boot/Spring AI release. Check their version compatibility before choosing dependencies.
+- Agent tools: Spring AI `@Tool` methods or MCP servers.
+- Workflow: Start with an explicit state machine or graph; add multi-agent delegation only when necessary.
+- RAG: PostgreSQL with pgvector, hybrid retrieval, and reranking where useful.
+- Memory: Separate session history from long-term user facts.
+- Scheduling: Persistent jobs using JobRunr or an equivalent scheduler; do not rely on in-memory timers for reminders that must survive restarts.
+- Frontend: React, if you want a web-based chat and productivity dashboard.
+
+## 6. What I would build on top of the chosen repository
+
+Start by getting the existing application running without changing its architecture. Then implement the missing pieces in this order:
+
+1. Memory-aware retrieval: combine current input, conversation history, and relevant long-term facts before retrieval.
+2. Query expansion: generate a small number of targeted alternative queries and merge their results using deduplication and reranking.
+3. Structured tool contracts: define typed input/output schemas for tasks, calendar events, reminders, alarms, and scheduling.
+4. Reliable execution: validate arguments, check dates and time zones, persist actions, and return the actual result to the LLM.
+5. Learning layer: extract candidate memories after each interaction, resolve conflicts with existing facts, and persist only useful updates.
+6. Evaluation: test retrieval relevance, correct tool selection, action success, memory accuracy, and whether the assistant invents completed actions.
+
+For real-world actions such as deleting an event or changing an alarm, add confirmation and authorization checks rather than letting the model execute arbitrary operations unchecked.
+
+Final verdict: Start by inspecting [ai-rag-agent](https://github.com/nitintayal/ai-rag-agent) for the most complete application-level feature match, and [Jarvis AI Platform](https://github.com/sujankim/jarvis-ai-platform) for the Java-first architecture. Neither should be treated as a verified drop-in implementation of every requirement until its code, tests, dependencies, and license have been checked.

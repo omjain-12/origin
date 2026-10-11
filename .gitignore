@@ -1,0 +1,58 @@
+# ── Java / Maven ─────────────────────────────────────────────────────────────
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/MavenWrapperDownloader.java
+
+# ── IDE ───────────────────────────────────────────────────────────────────────
+.idea/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+*.sublime-project
+*.sublime-workspace
+.vscode/
+
+# ── Node / React / Vite ──────────────────────────────────────────────────────
+node_modules/
+dist/
+.output/
+.nuxt/
+.next/
+.cache/
+*.local
+
+# ── Environment & Secrets ────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+secrets/
+
+# ── Docker ───────────────────────────────────────────────────────────────────
+.dockerignore
+
+# ── OS ───────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+logs/
+spring.log
+
+# ── Data ─────────────────────────────────────────────────────────────────────
+data/uploads/
+data/documents/*.pdf
+data/documents/*.docx
+pgdata/
