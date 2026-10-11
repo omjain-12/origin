@@ -1,24 +1,27 @@
 # Active Context: Origin
 
 ## Current State & Focus
-- **Current Phase**: Phase 3 Complete → Ready for Phase 7 (Frontend) after credentials.
-- **Active Task**: Awaiting Azure OpenAI credentials from user before running live tool tests.
-- **Recent Progress (this session)**:
-  - ✅ **Phase 0** — Git init, `.gitignore`, `.env.example`, `docker-compose.yml` (pgvector/pgvector:pg16).
-  - ✅ **Phase 1** — Maven `backend/` scaffold with `pom.xml` (Spring Boot 3.3.4, Spring AI 1.0.0 BOM, pgvector, Lombok).
-  - ✅ **Phase 2** — All JPA entities + repositories with native pgvector queries.
-  - ✅ **Phase 3** — All 5 Spring AI `@Tool` components + BackgroundNotificationDispatcher.
-  - ✅ **Phases 4-6** — QueryExpansionService, VectorRetrievalService, DocumentIngestionService, UserMemoryService, LearningLayerService, AgentOrchestratorService.
-  - ✅ REST controllers: ChatController, DashboardController, MemoryController, DocumentController.
-  - ✅ Initial git commit: `350b0bb` — 70 files, 3135 insertions.
+- **Current Phase**: Phase 7 Complete (Frontend Built & Verified) → Phase 8 (Runtime Verification).
+- **Active Task**: All frontend views, theme system, and backend scaffolding complete. Ready for runtime database boot when Docker Desktop is active.
+- **Recent Progress**:
+  - ✅ **Complete Rename**: Entire repository, packages (`com.origin.*`), classes, configs, and root directory renamed from RamLaal to **Origin**. Zero traces remain.
+  - ✅ **LLM Provider**: AWS Bedrock Mantle OpenAI-compatible endpoint with `zai.glm-5` (LLM) and `zai.glm-4.7` (embeddings) tested live.
+  - ✅ **Phase 7 (React Frontend)**:
+    - Editorial SaaS aesthetic inspired by reference design (warm ivory, periwinkle, lavender, sage).
+    - Dual **Light & Dark Mode** toggle with persistent `localStorage` preference.
+    - **Assistant Chat View**: Welcome hero, prompt suggestion chips, message thread, keyboard shortcut support.
+    - **Productivity Dashboard View**: KPI cards (tasks, events, reminders, alarms), timeline schedule, active todos with priority badges, cron jobs.
+    - **Durable Memory Bank View**: Stored user facts categorized and filterable with instant deletion.
+    - **Document Knowledge Base (RAG) View**: File dropzone for `.txt`/`.md` with chunking/vector status.
+    - Full TypeScript type-safety verified (`tsc -b && vite build` passed with zero errors).
 
 ## Active Decisions
-- Spring AI 1.0.0 GA used for stable API.
-- word-based chunking (configurable via `Origin.retrieval.chunk-size/overlap`).
-- `Origin.memory.user-id=default-user` — single-user mode.
+- Frontend communicates with Spring Boot backend via REST endpoints + Vite proxy (`/api` -> `http://localhost:8080`).
+- Model parameters simplified to two environment variables: `LLM_MODEL` and `EMBEDDING_MODEL`.
+- Theme system managed via CSS custom properties and `data-theme` attribute on root document.
 
 ## Immediate Next Steps
-1. **User provides Azure OpenAI credentials** → copy `.env.example` to `.env`, fill values.
-2. Start `docker-compose up -d` to boot PostgreSQL.
-3. Run `mvn spring-boot:run` in `backend/` and verify startup.
-4. Phase 7: Scaffold `frontend/` with Vite + React + TypeScript + Tailwind CSS.
+1. Boot Docker Desktop and start PostgreSQL: `docker compose up -d`.
+2. Start backend: `mvn spring-boot:run` (or run via IDE).
+3. Start frontend: `npm run dev` in `frontend/`.
+4. Execute end-to-end multi-turn verification prompt.
