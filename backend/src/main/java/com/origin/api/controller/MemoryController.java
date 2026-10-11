@@ -23,6 +23,20 @@ public class MemoryController {
         return ResponseEntity.ok(userMemoryService.getAllMemories());
     }
 
+    public record CreateMemoryDto(String factText, String category) {}
+
+    @PostMapping
+    public ResponseEntity<UserMemory> createMemory(@RequestBody CreateMemoryDto dto) {
+        if (dto.factText() == null || dto.factText().isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+        UserMemory created = userMemoryService.saveMemory(
+            dto.factText(),
+            dto.category() != null ? dto.category() : "GENERAL"
+        );
+        return ResponseEntity.ok(created);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMemory(@PathVariable UUID id) {
         userMemoryService.deleteMemory(id);
