@@ -33,16 +33,31 @@
       - Cleaned up developer jargon (e.g., `pgvector`, `(RAG)`, `zai.glm-5 / Bedrock Mantle`) in `Sidebar` and `DocumentsView`.
     - ✅ **Repository Handover & Gitignore Hygiene**:
       - Untracked dev prompts, test files, and scratch artifacts (`refrence_chatgpt_response.txt`, `IMPLEMENTATION_PROMPT.md`, `PROJECT_PLAN.md`, `TEST_PROMPTS.md`, `test_*.py`, root `mvn.cmd`/`mvn.ps1`, `backend/src/test/`) so another developer receives clean, production-grade source code.
-      - Added comprehensive ignoring rules in `.gitignore` preserving local development files while keeping git commits minimal and focused.
+    - ✅ **Demo Persona Seeder (`seed_demo_data.py`)**:
+      - Pure standard-library Python seeder (zero external pip packages required).
+      - Populates a rich demo persona for **Bhumi** (Senior Product Designer):
+        - Memories: Bhumi identity, cake preference (chocolate truffle/red velvet), cats, dog Leo (Golden Retriever), meetings after 2 PM, 7 AM yoga.
+        - Calendar schedule: UX reviews, 1:1 syncs, roadmap alignments.
+        - Actionable tasks: Figma mockups, cake order, vet appointments.
+        - Reminders & alarms: Hydration, dog walking, morning yoga alarms.
+        - Knowledge Base: Ingests `project_aurora_design_brief.md` into pgvector.
+        - Chat conversation: Pre-populates a multi-turn chat session with Origin copilot.
+      - Backed by REST endpoints on `DashboardController` (`POST /events`, `/tasks`, `/reminders`, `/alarms`, `DELETE /clear`) and `MemoryController` (`POST /memories`).
+    - ✅ **Comprehensive Developer Documentation (`README.md`)**:
+      - Added 5-step quick start guide (Docker, Backend, Frontend, Demo Seeder, Verification).
+      - Included manager walkthrough presentation script with prompt test cases.
+      - Full directory map and build verification commands.
     - Verified with `mvn test-compile` (Backend) and `npm run build` (Frontend).
 
 ## Active Decisions
 - Right sidebar sits neatly inside `ChatView`, leaving full screen for other views (Dashboard, Memory, Documents).
 - Polling interval set to 15s with instant trigger on `handleSend` / chat tool completions.
+- Demo seeder runs against `http://localhost:8080/api` using standard `urllib` without extra dependencies.
 
 ## Immediate Next Steps
 1. Boot Docker Desktop and start PostgreSQL: `docker compose up -d`.
 2. Start backend: `mvn spring-boot:run` (or run via IDE).
 3. Start frontend: `npm run dev` in `frontend/`.
-4. Execute end-to-end multi-turn verification prompt.
+4. Run `python seed_demo_data.py` to populate Bhumi's full demo data suite.
+5. Present the live demo to the manager using the included walkthrough script.
 
