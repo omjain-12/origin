@@ -1,4 +1,4 @@
-# Active Context: RamLaal
+# Active Context: Origin
 
 ## Current State & Focus
 - **Current Phase**: Phase 3 Complete → Ready for Phase 7 (Frontend) after credentials.
@@ -14,8 +14,8 @@
 
 ## Active Decisions
 - Spring AI 1.0.0 GA used for stable API.
-- word-based chunking (configurable via `ramlaal.retrieval.chunk-size/overlap`).
-- `ramlaal.memory.user-id=default-user` — single-user mode.
+- word-based chunking (configurable via `Origin.retrieval.chunk-size/overlap`).
+- `Origin.memory.user-id=default-user` — single-user mode.
 
 ## Immediate Next Steps
 1. **User provides Azure OpenAI credentials** → copy `.env.example` to `.env`, fill values.

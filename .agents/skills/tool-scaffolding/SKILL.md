@@ -7,7 +7,7 @@ description: >-
 
 # Tool Scaffolding Skill
 
-Use this skill when adding a new action tool for RamLaal.
+Use this skill when adding a new action tool for Origin.
 
 ## Tool Requirements Checklist
 

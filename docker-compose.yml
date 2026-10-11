@@ -1,18 +1,18 @@
 services:
   postgres:
     image: pgvector/pgvector:pg16
-    container_name: ramlaal-postgres
+    container_name: Origin-postgres
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-ramlaal}
-      POSTGRES_USER: ${POSTGRES_USER:-ramlaal}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ramlaal_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-Origin}
+      POSTGRES_USER: ${POSTGRES_USER:-Origin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-Origin_secret}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./backend/src/main/resources/db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ramlaal} -d ${POSTGRES_DB:-ramlaal}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-Origin} -d ${POSTGRES_DB:-Origin}"]
       interval: 10s
       timeout: 5s
       retries: 5

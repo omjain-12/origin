@@ -1,12 +1,12 @@
 # AGENTS.md - Repository AI Operating Guidelines
 
-Welcome, AI Agent! This file is the primary entry point and operational manual for any AI coding assistant (Google Antigravity, Claude Code, Cursor, Windsurf, Copilot, or CLI agents) working in the **RamLaal** repository.
+Welcome, AI Agent! This file is the primary entry point and operational manual for any AI coding assistant (Google Antigravity, Claude Code, Cursor, Windsurf, Copilot, or CLI agents) working in the **Origin** repository.
 
 ---
 
 ## 1. Project Mission & Identity
 
-**RamLaal** is an advanced, autonomous personal AI assistant and workflow orchestrator. Rather than a simple conversational chatbot, it is engineered as a stateful, tool-enabled AI platform featuring:
+**Origin** is an advanced, autonomous personal AI assistant and workflow orchestrator. Rather than a simple conversational chatbot, it is engineered as a stateful, tool-enabled AI platform featuring:
 1. **Persistent Multi-Tier Memory**: Working memory, session history, and durable long-term factual memory.
 2. **Hybrid RAG & Retrieval**: Vector search (pgvector), BM25/keyword retrieval, and query expansion.
 3. **Tool Execution Engine**: Robust APIs for calendar management, recurring tasks, reminders, alarms, and schedulers.

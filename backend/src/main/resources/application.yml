@@ -1,11 +1,11 @@
 spring:
   application:
-    name: ramlaal
+    name: Origin
 
   datasource:
-    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:ramlaal}
-    username: ${POSTGRES_USER:ramlaal}
-    password: ${POSTGRES_PASSWORD:ramlaal_secret}
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:Origin}
+    username: ${POSTGRES_USER:Origin}
+    password: ${POSTGRES_PASSWORD:Origin_secret}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -40,10 +40,10 @@ server:
 
 logging:
   level:
-    com.ramlaal: DEBUG
+    com.origin: DEBUG
     org.springframework.ai: INFO
 
-ramlaal:
+Origin:
   documents:
     scan-directory: ./data/documents
   retrieval:

@@ -7,7 +7,7 @@ description: >-
 
 # RAG & Hybrid Retrieval Skill
 
-Use this skill when developing or tuning document ingestion, search pipelines, or knowledge retrieval for RamLaal.
+Use this skill when developing or tuning document ingestion, search pipelines, or knowledge retrieval for Origin.
 
 ## Procedure
 

@@ -1,7 +1,7 @@
-# Project Brief: RamLaal
+# Project Brief: Origin
 
 ## Overview
-**RamLaal** is an autonomous personal AI assistant and workflow orchestration platform. It is designed to act as a proactive, capable digital copilot rather than a passive question-answering chatbot.
+**Origin** is an autonomous personal AI assistant and workflow orchestration platform. It is designed to act as a proactive, capable digital copilot rather than a passive question-answering chatbot.
 
 ## Core Vision & Objectives
 1. **Intelligent Personal Assistant**:

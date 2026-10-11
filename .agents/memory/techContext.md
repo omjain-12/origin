@@ -1,4 +1,4 @@
-# Tech Context: RamLaal
+# Tech Context: Origin
 
 ## Confirmed Technology Stack
 

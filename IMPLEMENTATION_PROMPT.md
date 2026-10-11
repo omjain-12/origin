@@ -1,12 +1,12 @@
 # SYSTEM DIRECTIVE & IMPLEMENTATION PROMPT
 
-> **Instructions for the AI Assistant**: You are tasked with implementing **RamLaal**, an autonomous personal AI assistant and workflow orchestrator. Read this prompt carefully and adhere strictly to all directives, constraints, and execution phases.
+> **Instructions for the AI Assistant**: You are tasked with implementing **Origin**, an autonomous personal AI assistant and workflow orchestrator. Read this prompt carefully and adhere strictly to all directives, constraints, and execution phases.
 
 ---
 
 ## 1. Project Mission & Context
 
-You are developing **RamLaal**, a stateful personal AI assistant capable of:
+You are developing **Origin**, a stateful personal AI assistant capable of:
 1. **User Memory & Context**: Recalls prior conversations and durable personal facts.
 2. **Query Expansion**: Expands user prompts into 2–3 targeted queries for effective retrieval.
 3. **Document RAG**: Ingests and searches local documents and uploads using vector search.

@@ -1,6 +1,6 @@
-# Cursor Rules for RamLaal
+# Cursor Rules for Origin
 
-You are an expert pair programmer working on the RamLaal assistant project.
+You are an expert pair programmer working on the Origin assistant project.
 
 1. **Operating Rules**:
    - Refer to `AGENTS.md` and `.agents/rules/*.md` for full project rules and coding standards.

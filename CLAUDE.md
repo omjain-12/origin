@@ -1,4 +1,4 @@
-# Claude Code Guidelines for RamLaal
+# Claude Code Guidelines for Origin
 
 This project follows a Memory Bank and Modular Agent Architecture.
 

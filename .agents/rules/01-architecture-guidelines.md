@@ -1,12 +1,12 @@
-# Architecture Guidelines for RamLaal
+# Architecture Guidelines for Origin
 
-This rule defines the architectural boundaries and responsibilities for components within the RamLaal assistant project.
+This rule defines the architectural boundaries and responsibilities for components within the Origin assistant project.
 
 ---
 
 ## 1. High-Level Modular Decomposition
 
-RamLaal is partitioned into six decoupled layers:
+Origin is partitioned into six decoupled layers:
 
 ```
 [User / Client]

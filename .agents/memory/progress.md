@@ -1,4 +1,4 @@
-# Project Progress: RamLaal
+# Project Progress: Origin
 
 ## Current Status: Backend Complete (Phases 0–6) — Awaiting Credentials & Frontend
 

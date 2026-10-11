@@ -1,4 +1,4 @@
-# System Patterns: RamLaal
+# System Patterns: Origin
 
 ## Architectural Patterns
 

@@ -1,6 +1,6 @@
-# PROJECT_PLAN.md: RamLaal Autonomous AI Assistant
+# PROJECT_PLAN.md: Origin Autonomous AI Assistant
 
-This document defines the finalized architecture and step-by-step implementation blueprint for **RamLaal**, an autonomous personal AI assistant built with **Java 21, Spring Boot 3.3+, Spring AI 1.0+, Azure OpenAI, PostgreSQL (pgvector), and React**.
+This document defines the finalized architecture and step-by-step implementation blueprint for **Origin**, an autonomous personal AI assistant built with **Java 21, Spring Boot 3.3+, Spring AI 1.0+, Azure OpenAI, PostgreSQL (pgvector), and React**.
 
 ---
 
@@ -145,7 +145,7 @@ This document defines the finalized architecture and step-by-step implementation
   - Upcoming Calendar events.
   - Interactive Todo/Task list.
   - Active Alarms & Reminders.
-  - Memory Bank inspector (what RamLaal knows about the user).
+  - Memory Bank inspector (what Origin knows about the user).
 
 ### Phase 8: Verification & Demonstration
 - [ ] Unit tests for tool schemas, date calculations, and vector operations.
