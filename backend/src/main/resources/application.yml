@@ -24,11 +24,11 @@ spring:
       base-url: ${BASE_URL:https://bedrock-mantle.us-east-1.api.aws/v1}
       chat:
         options:
-          model: ${CHAT_MODEL:openai/zai.glm-5}
+          model: ${LLM_MODEL:zai.glm-5}
           temperature: 0.7
       embedding:
         options:
-          model: ${EMBEDDING_MODEL:openai/zai.glm-4.7}
+          model: ${EMBEDDING_MODEL:zai.glm-4.7}
 
   servlet:
     multipart:
@@ -52,7 +52,3 @@ ramlaal:
     chunk-overlap: 50
   memory:
     user-id: default-user
-  models:
-    planning: ${PLANNING_MODELS:openai/zai.glm-5}
-    fast: ${FAST_CHAT_MODEL:openai/zai.glm-4.7-flash}
-    full: ${EXECUTION_MODELS_FULL:openai/zai.glm-5}

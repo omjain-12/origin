@@ -43,9 +43,6 @@ public class AgentOrchestratorService {
     @Value("${ramlaal.memory.user-id:default-user}")
     private String userId;
 
-    @Value("${ramlaal.models.planning:openai/zai.glm-5}")
-    private String planningModel;
-
     private static final String SYSTEM_PROMPT = """
         You are RamLaal, a proactive and intelligent personal AI assistant. You have access to the
         user's calendar, tasks, reminders, alarms, and scheduled jobs. Use tools actively when the
@@ -103,7 +100,6 @@ public class AgentOrchestratorService {
             calendarTool, taskTool, reminderTool, alarmTool, schedulerTool
         );
         var chatOptions = OpenAiChatOptions.builder()
-            .model(planningModel)
             .toolCallbacks(toolCallbacks)
             .build();
 

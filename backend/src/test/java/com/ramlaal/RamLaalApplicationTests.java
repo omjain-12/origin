@@ -8,8 +8,8 @@ import org.springframework.test.context.TestPropertySource;
 @TestPropertySource(properties = {
     "API_KEY=test-key",
     "BASE_URL=https://bedrock-mantle.us-east-1.api.aws/v1",
-    "CHAT_MODEL=openai/zai.glm-5",
-    "EMBEDDING_MODEL=openai/zai.glm-4.7",
+    "LLM_MODEL=zai.glm-5",
+    "EMBEDDING_MODEL=zai.glm-4.7",
     "spring.jpa.hibernate.ddl-auto=none",
     "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration"
 })
