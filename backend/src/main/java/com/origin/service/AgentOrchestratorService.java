@@ -131,6 +131,7 @@ public class AgentOrchestratorService {
         callbacks.addAll(schedulerTool.getCallbacks());
 
         var chatOptions = OpenAiChatOptions.builder()
+            .model("zai.glm-5")
             .functionCallbacks(callbacks)
             .build();
 
