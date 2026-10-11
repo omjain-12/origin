@@ -89,3 +89,4 @@ public class LocalDeterministicEmbeddingModel implements EmbeddingModel {
         return DIMENSIONS;
     }
 }
+
