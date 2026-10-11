@@ -2,7 +2,6 @@ package com.origin.api.controller;
 
 import com.origin.domain.entity.*;
 import com.origin.domain.repository.*;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +11,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/dashboard")
-@RequiredArgsConstructor
 public class DashboardController {
 
     private final CalendarEventRepository calendarEventRepository;
@@ -23,6 +21,18 @@ public class DashboardController {
 
     @Value("${Origin.memory.user-id:default-user}")
     private String userId;
+
+    public DashboardController(CalendarEventRepository calendarEventRepository,
+                               TaskItemRepository taskItemRepository,
+                               ReminderItemRepository reminderItemRepository,
+                               AlarmItemRepository alarmItemRepository,
+                               ScheduledJobItemRepository scheduledJobItemRepository) {
+        this.calendarEventRepository = calendarEventRepository;
+        this.taskItemRepository = taskItemRepository;
+        this.reminderItemRepository = reminderItemRepository;
+        this.alarmItemRepository = alarmItemRepository;
+        this.scheduledJobItemRepository = scheduledJobItemRepository;
+    }
 
     @GetMapping
     public ResponseEntity<Map<String, Object>> getDashboard() {
@@ -40,4 +50,3 @@ public class DashboardController {
         ));
     }
 }
-

@@ -1,10 +1,11 @@
 package com.origin.tool;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.origin.domain.entity.ScheduledJobItem;
 import com.origin.domain.repository.ScheduledJobItemRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.ai.tool.annotation.Tool;
-import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.ai.model.function.FunctionCallback;
+import org.springframework.ai.model.function.FunctionCallbackWrapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +13,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-@RequiredArgsConstructor
 public class SchedulerTool {
 
     private final ScheduledJobItemRepository scheduledJobItemRepository;
@@ -20,31 +20,36 @@ public class SchedulerTool {
     @Value("${Origin.memory.user-id:default-user}")
     private String userId;
 
-    @Tool(description = "Schedules a recurring job using a cron expression. Returns the job's ID.")
-    public String scheduleJob(
-        @ToolParam(description = "Human-readable job name") String jobName,
-        @ToolParam(description = "Standard 5-field cron expression, e.g. '0 9 * * MON'") String cronExpression,
-        @ToolParam(description = "Optional description of what this job does") String description
-    ) {
+    public SchedulerTool(ScheduledJobItemRepository scheduledJobItemRepository) {
+        this.scheduledJobItemRepository = scheduledJobItemRepository;
+    }
+
+    public record ScheduleJobRequest(
+        @JsonProperty(required = true) @JsonPropertyDescription("Human-readable job name") String jobName,
+        @JsonProperty(required = true) @JsonPropertyDescription("Standard 5-field cron expression, e.g. '0 9 * * MON'") String cronExpression,
+        @JsonPropertyDescription("Optional description of what this job does") String description
+    ) {}
+
+    public record ListJobsRequest() {}
+
+    public String scheduleJob(ScheduleJobRequest req) {
         try {
-            // Validate cron field count
-            if (cronExpression.trim().split("\\s+").length != 5) {
+            if (req.cronExpression() == null || req.cronExpression().trim().split("\\s+").length != 5) {
                 return "Invalid cron expression. Must have exactly 5 fields (minute hour day month weekday).";
             }
             ScheduledJobItem job = new ScheduledJobItem();
             job.setUserId(userId);
-            job.setJobName(jobName);
-            job.setCronExpression(cronExpression);
-            job.setDescription(description);
+            job.setJobName(req.jobName());
+            job.setCronExpression(req.cronExpression());
+            job.setDescription(req.description());
             ScheduledJobItem saved = scheduledJobItemRepository.save(job);
-            return "Job scheduled with ID: " + saved.getId() + " — cron: " + cronExpression;
+            return "Job scheduled with ID: " + saved.getId() + " — cron: " + req.cronExpression();
         } catch (Exception e) {
             return "Failed to schedule job: " + e.getMessage();
         }
     }
 
-    @Tool(description = "Lists all active scheduled jobs for the user.")
-    public String listJobs() {
+    public String listJobs(ListJobsRequest req) {
         try {
             List<ScheduledJobItem> jobs = scheduledJobItemRepository
                 .findByUserIdAndStatusOrderByCreatedAtDesc(userId, ScheduledJobItem.Status.ACTIVE);
@@ -56,5 +61,19 @@ public class SchedulerTool {
             return "Failed to list jobs: " + e.getMessage();
         }
     }
-}
 
+    public List<FunctionCallback> getCallbacks() {
+        return List.of(
+            FunctionCallbackWrapper.builder(this::scheduleJob)
+                .withName("scheduleJob")
+                .withDescription("Schedules a recurring job using a 5-field cron expression.")
+                .withInputType(ScheduleJobRequest.class)
+                .build(),
+            FunctionCallbackWrapper.builder(this::listJobs)
+                .withName("listJobs")
+                .withDescription("Lists all active scheduled jobs for the user.")
+                .withInputType(ListJobsRequest.class)
+                .build()
+        );
+    }
+}

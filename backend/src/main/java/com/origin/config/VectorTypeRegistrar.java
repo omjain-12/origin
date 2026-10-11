@@ -7,6 +7,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.sql.Connection;
+
 @Component
 public class VectorTypeRegistrar {
 
@@ -15,14 +17,15 @@ public class VectorTypeRegistrar {
 
     @EventListener(ApplicationReadyEvent.class)
     public void registerVectorType() {
-        jdbcTemplate.execute("SELECT 1");
         try {
-            PGvector.addVectorType(
-                jdbcTemplate.getDataSource().getConnection().unwrap(org.postgresql.PGConnection.class)
-            );
+            jdbcTemplate.execute("SELECT 1");
+            if (jdbcTemplate.getDataSource() != null) {
+                try (Connection conn = jdbcTemplate.getDataSource().getConnection()) {
+                    PGvector.addVectorType(conn);
+                }
+            }
         } catch (Exception e) {
             // pgvector type registration is best-effort on startup
         }
     }
 }
-

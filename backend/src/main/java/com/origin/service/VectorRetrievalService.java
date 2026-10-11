@@ -2,8 +2,8 @@ package com.origin.service;
 
 import com.origin.domain.entity.DocumentChunk;
 import com.origin.domain.repository.DocumentChunkRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -12,19 +12,24 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class VectorRetrievalService {
+
+    private static final Logger log = LoggerFactory.getLogger(VectorRetrievalService.class);
 
     private final EmbeddingModel embeddingModel;
     private final DocumentChunkRepository documentChunkRepository;
-    private final UserMemoryService userMemoryService;
 
     @Value("${Origin.retrieval.top-k:5}")
     private int topK;
 
     @Value("${Origin.memory.user-id:default-user}")
     private String userId;
+
+    public VectorRetrievalService(EmbeddingModel embeddingModel,
+                                  DocumentChunkRepository documentChunkRepository) {
+        this.embeddingModel = embeddingModel;
+        this.documentChunkRepository = documentChunkRepository;
+    }
 
     /**
      * Retrieves top-k document chunks semantically matching the given queries,
@@ -69,4 +74,3 @@ public class VectorRetrievalService {
         return sb.toString();
     }
 }
-

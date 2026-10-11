@@ -3,7 +3,6 @@ package com.origin.api.controller;
 import com.origin.api.dto.ChatRequest;
 import com.origin.domain.entity.ChatSession;
 import com.origin.service.AgentOrchestratorService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,10 +12,13 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/chat")
-@RequiredArgsConstructor
 public class ChatController {
 
     private final AgentOrchestratorService orchestrator;
+
+    public ChatController(AgentOrchestratorService orchestrator) {
+        this.orchestrator = orchestrator;
+    }
 
     @PostMapping("/session")
     public ResponseEntity<Map<String, String>> createSession() {
@@ -39,4 +41,3 @@ public class ChatController {
         return ResponseEntity.ok(response);
     }
 }
-

@@ -2,7 +2,6 @@ package com.origin.api.controller;
 
 import com.origin.domain.entity.Document;
 import com.origin.service.DocumentIngestionService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,10 +11,13 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/documents")
-@RequiredArgsConstructor
 public class DocumentController {
 
     private final DocumentIngestionService documentIngestionService;
+
+    public DocumentController(DocumentIngestionService documentIngestionService) {
+        this.documentIngestionService = documentIngestionService;
+    }
 
     @PostMapping("/upload")
     public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file) {
@@ -35,4 +37,3 @@ public class DocumentController {
         }
     }
 }
-

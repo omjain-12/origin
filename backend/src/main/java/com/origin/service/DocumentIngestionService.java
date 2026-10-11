@@ -4,11 +4,13 @@ import com.origin.domain.entity.Document;
 import com.origin.domain.entity.DocumentChunk;
 import com.origin.domain.repository.DocumentChunkRepository;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import jakarta.persistence.EntityManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -18,13 +20,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class DocumentIngestionService {
+
+    private static final Logger log = LoggerFactory.getLogger(DocumentIngestionService.class);
 
     private final EmbeddingModel embeddingModel;
     private final DocumentChunkRepository documentChunkRepository;
-    private final jakarta.persistence.EntityManager entityManager;
+    private final EntityManager entityManager;
 
     @Value("${Origin.documents.scan-directory:./data/documents}")
     private String scanDirectory;
@@ -34,6 +36,14 @@ public class DocumentIngestionService {
 
     @Value("${Origin.retrieval.chunk-overlap:50}")
     private int chunkOverlap;
+
+    public DocumentIngestionService(EmbeddingModel embeddingModel,
+                                    DocumentChunkRepository documentChunkRepository,
+                                    EntityManager entityManager) {
+        this.embeddingModel = embeddingModel;
+        this.documentChunkRepository = documentChunkRepository;
+        this.entityManager = entityManager;
+    }
 
     @PostConstruct
     public void scanAndIngestDirectory() {
@@ -62,8 +72,8 @@ public class DocumentIngestionService {
         return ingestFile(file.getOriginalFilename(), file.getBytes());
     }
 
-    @org.springframework.transaction.annotation.Transactional
-    Document ingestFile(String fileName, byte[] bytes) {
+    @Transactional
+    public Document ingestFile(String fileName, byte[] bytes) {
         String text = new String(bytes, StandardCharsets.UTF_8);
         List<String> chunks = chunk(text);
 
@@ -111,4 +121,3 @@ public class DocumentIngestionService {
         return lower.endsWith(".txt") || lower.endsWith(".md");
     }
 }
-

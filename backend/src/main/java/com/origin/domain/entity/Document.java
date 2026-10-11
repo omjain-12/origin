@@ -1,8 +1,6 @@
 package com.origin.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
@@ -12,8 +10,6 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "documents")
-@Data
-@NoArgsConstructor
 public class Document {
 
     @Id
@@ -36,5 +32,27 @@ public class Document {
     private Instant uploadedAt;
 
     public enum IngestionStatus { PENDING, PROCESSING, COMPLETED, FAILED }
-}
 
+    public Document() {}
+
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
+
+    public String getFileName() { return fileName; }
+    public void setFileName(String fileName) { this.fileName = fileName; }
+
+    public String getMimeType() { return mimeType; }
+    public void setMimeType(String mimeType) { this.mimeType = mimeType; }
+
+    public Long getFileSizeBytes() { return fileSizeBytes; }
+    public void setFileSizeBytes(Long fileSizeBytes) { this.fileSizeBytes = fileSizeBytes; }
+
+    public IngestionStatus getStatus() { return status; }
+    public void setStatus(IngestionStatus status) { this.status = status; }
+
+    public List<DocumentChunk> getChunks() { return chunks; }
+    public void setChunks(List<DocumentChunk> chunks) { this.chunks = chunks; }
+
+    public Instant getUploadedAt() { return uploadedAt; }
+    public void setUploadedAt(Instant uploadedAt) { this.uploadedAt = uploadedAt; }
+}

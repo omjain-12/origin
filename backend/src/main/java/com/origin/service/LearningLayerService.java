@@ -1,8 +1,7 @@
 package com.origin.service;
 
-import com.origin.domain.entity.UserMemory;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -12,12 +11,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class LearningLayerService {
+
+    private static final Logger log = LoggerFactory.getLogger(LearningLayerService.class);
 
     private final ChatModel chatModel;
     private final UserMemoryService userMemoryService;
+
+    public LearningLayerService(ChatModel chatModel, UserMemoryService userMemoryService) {
+        this.chatModel = chatModel;
+        this.userMemoryService = userMemoryService;
+    }
 
     private static final String EXTRACTION_PROMPT = """
         Analyze the following conversation and extract any NEW durable personal facts, preferences,

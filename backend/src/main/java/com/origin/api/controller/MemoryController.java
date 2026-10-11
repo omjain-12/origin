@@ -2,7 +2,6 @@ package com.origin.api.controller;
 
 import com.origin.domain.entity.UserMemory;
 import com.origin.service.UserMemoryService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,10 +10,13 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/memories")
-@RequiredArgsConstructor
 public class MemoryController {
 
     private final UserMemoryService userMemoryService;
+
+    public MemoryController(UserMemoryService userMemoryService) {
+        this.userMemoryService = userMemoryService;
+    }
 
     @GetMapping
     public ResponseEntity<List<UserMemory>> getMemories() {
@@ -27,4 +29,3 @@ public class MemoryController {
         return ResponseEntity.noContent().build();
     }
 }
-

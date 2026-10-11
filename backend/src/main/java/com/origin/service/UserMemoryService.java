@@ -2,8 +2,8 @@ package com.origin.service;
 
 import com.origin.domain.entity.UserMemory;
 import com.origin.domain.repository.UserMemoryRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -12,15 +12,20 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class UserMemoryService {
+
+    private static final Logger log = LoggerFactory.getLogger(UserMemoryService.class);
 
     private final UserMemoryRepository userMemoryRepository;
     private final EmbeddingModel embeddingModel;
 
     @Value("${Origin.memory.user-id:default-user}")
     private String userId;
+
+    public UserMemoryService(UserMemoryRepository userMemoryRepository, EmbeddingModel embeddingModel) {
+        this.userMemoryRepository = userMemoryRepository;
+        this.embeddingModel = embeddingModel;
+    }
 
     public List<UserMemory> findRelevantMemories(String query, int topK) {
         try {
@@ -56,4 +61,3 @@ public class UserMemoryService {
         userMemoryRepository.deleteById(id);
     }
 }
-

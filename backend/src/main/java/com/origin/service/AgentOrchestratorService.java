@@ -6,13 +6,13 @@ import com.origin.domain.entity.UserMemory;
 import com.origin.domain.repository.ChatMessageRepository;
 import com.origin.domain.repository.ChatSessionRepository;
 import com.origin.tool.*;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.messages.*;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.model.function.FunctionCallback;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,9 +23,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class AgentOrchestratorService {
+
+    private static final Logger log = LoggerFactory.getLogger(AgentOrchestratorService.class);
 
     private final ChatModel chatModel;
     private final ChatSessionRepository sessionRepository;
@@ -42,6 +42,33 @@ public class AgentOrchestratorService {
 
     @Value("${Origin.memory.user-id:default-user}")
     private String userId;
+
+    public AgentOrchestratorService(
+            ChatModel chatModel,
+            ChatSessionRepository sessionRepository,
+            ChatMessageRepository messageRepository,
+            QueryExpansionService queryExpansionService,
+            VectorRetrievalService vectorRetrievalService,
+            UserMemoryService userMemoryService,
+            LearningLayerService learningLayerService,
+            CalendarTool calendarTool,
+            TaskTool taskTool,
+            ReminderTool reminderTool,
+            AlarmTool alarmTool,
+            SchedulerTool schedulerTool) {
+        this.chatModel = chatModel;
+        this.sessionRepository = sessionRepository;
+        this.messageRepository = messageRepository;
+        this.queryExpansionService = queryExpansionService;
+        this.vectorRetrievalService = vectorRetrievalService;
+        this.userMemoryService = userMemoryService;
+        this.learningLayerService = learningLayerService;
+        this.calendarTool = calendarTool;
+        this.taskTool = taskTool;
+        this.reminderTool = reminderTool;
+        this.alarmTool = alarmTool;
+        this.schedulerTool = schedulerTool;
+    }
 
     private static final String SYSTEM_PROMPT = """
         You are Origin, a proactive and intelligent personal AI assistant. You have access to the
@@ -96,11 +123,15 @@ public class AgentOrchestratorService {
         messageRepository.save(userMsg);
 
         // 5. Call LLM with tools (using OpenAI-compatible options)
-        var toolCallbacks = ToolCallbackProvider.from(
-            calendarTool, taskTool, reminderTool, alarmTool, schedulerTool
-        );
+        List<FunctionCallback> callbacks = new ArrayList<>();
+        callbacks.addAll(calendarTool.getCallbacks());
+        callbacks.addAll(taskTool.getCallbacks());
+        callbacks.addAll(reminderTool.getCallbacks());
+        callbacks.addAll(alarmTool.getCallbacks());
+        callbacks.addAll(schedulerTool.getCallbacks());
+
         var chatOptions = OpenAiChatOptions.builder()
-            .toolCallbacks(toolCallbacks)
+            .functionCallbacks(callbacks)
             .build();
 
         String assistantResponse = chatModel.call(new Prompt(messages, chatOptions))

@@ -1,15 +1,11 @@
 package com.origin.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
 @Entity
 @Table(name = "document_chunks")
-@Data
-@NoArgsConstructor
 public class DocumentChunk {
 
     @Id
@@ -23,11 +19,25 @@ public class DocumentChunk {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    /** Chunk sequence number within the parent document */
     private int chunkIndex;
 
-    /** 1536-dim embedding for similarity retrieval */
     @Column(columnDefinition = "vector(1536)")
     private float[] embedding;
-}
 
+    public DocumentChunk() {}
+
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
+
+    public Document getDocument() { return document; }
+    public void setDocument(Document document) { this.document = document; }
+
+    public String getContent() { return content; }
+    public void setContent(String content) { this.content = content; }
+
+    public int getChunkIndex() { return chunkIndex; }
+    public void setChunkIndex(int chunkIndex) { this.chunkIndex = chunkIndex; }
+
+    public float[] getEmbedding() { return embedding; }
+    public void setEmbedding(float[] embedding) { this.embedding = embedding; }
+}

@@ -1,7 +1,7 @@
 package com.origin.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -10,11 +10,15 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class QueryExpansionService {
 
+    private static final Logger log = LoggerFactory.getLogger(QueryExpansionService.class);
+
     private final ChatModel chatModel;
+
+    public QueryExpansionService(ChatModel chatModel) {
+        this.chatModel = chatModel;
+    }
 
     private static final String EXPANSION_PROMPT = """
         You are a query expansion assistant. Given the user's question below, produce exactly 3 alternative
