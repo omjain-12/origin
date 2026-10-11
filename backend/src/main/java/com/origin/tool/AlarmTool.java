@@ -28,13 +28,13 @@ public class AlarmTool {
 
     public record SetAlarmRequest(
         @JsonProperty(required = true) @JsonPropertyDescription("Label/description for the alarm") String label,
-        @JsonProperty(required = true) @JsonPropertyDescription("ISO-8601 datetime for the alarm trigger (e.g. 2026-10-15T07:00:00Z)") String triggerAt
+        @JsonProperty(required = true) @JsonPropertyDescription("ISO-8601 datetime for the alarm trigger (e.g. YYYY-MM-DDTHH:mm:ssZ), calculated relative to current system time") String triggerAt
     ) {}
 
     public record ListAlarmsRequest() {}
 
     public record DismissAlarmRequest(
-        @JsonProperty(required = true) @JsonPropertyDescription("UUID of the alarm to dismiss") String alarmId
+        @JsonProperty(required = true) @JsonPropertyDescription("UUID or label/name of the alarm to dismiss") String alarmId
     ) {}
 
     public String setAlarm(SetAlarmRequest req) {
@@ -42,9 +42,9 @@ public class AlarmTool {
             AlarmItem alarm = new AlarmItem();
             alarm.setUserId(userId);
             alarm.setLabel(req.label());
-            alarm.setTriggerAt(Instant.parse(req.triggerAt()));
+            alarm.setTriggerAt(com.origin.util.DateTimeUtil.parseInstant(req.triggerAt()));
             AlarmItem saved = alarmItemRepository.save(alarm);
-            return "Alarm set with ID: " + saved.getId() + " — triggers at " + saved.getTriggerAt();
+            return "Alarm set: '" + saved.getLabel() + "' for " + saved.getTriggerAt() + ".";
         } catch (Exception e) {
             return "Failed to set alarm: " + e.getMessage();
         }
@@ -53,10 +53,13 @@ public class AlarmTool {
     public String listActiveAlarms(ListAlarmsRequest req) {
         try {
             List<AlarmItem> alarms = alarmItemRepository
-                .findByUserIdAndDismissedFalseOrderByTriggerAtAsc(userId);
-            if (alarms.isEmpty()) return "No active alarms.";
+                .findByUserIdOrderByTriggerAtAsc(userId);
+            if (alarms.isEmpty()) return "No alarms found in database.";
             return alarms.stream()
-                .map(a -> "[%s] %s — triggers at %s".formatted(a.getId(), a.getLabel(), a.getTriggerAt()))
+                .map(a -> "- Alarm: '%s' scheduled for %s [Status: %s]".formatted(
+                    a.getLabel(),
+                    a.getTriggerAt(),
+                    a.isDismissed() ? "DISMISSED" : "ACTIVE"))
                 .collect(Collectors.joining("\n"));
         } catch (Exception e) {
             return "Failed to list alarms: " + e.getMessage();
@@ -65,12 +68,26 @@ public class AlarmTool {
 
     public String dismissAlarm(DismissAlarmRequest req) {
         try {
-            UUID id = UUID.fromString(req.alarmId());
-            return alarmItemRepository.findById(id).map(alarm -> {
-                alarm.setDismissed(true);
-                alarmItemRepository.save(alarm);
-                return "Alarm '" + alarm.getLabel() + "' dismissed.";
-            }).orElse("No alarm found with ID: " + req.alarmId());
+            try {
+                UUID id = UUID.fromString(req.alarmId());
+                return alarmItemRepository.findById(id).map(alarm -> {
+                    alarm.setDismissed(true);
+                    alarmItemRepository.save(alarm);
+                    return "Alarm '" + alarm.getLabel() + "' dismissed.";
+                }).orElse("No alarm found with ID: " + req.alarmId());
+            } catch (IllegalArgumentException notUuid) {
+                List<AlarmItem> matches = alarmItemRepository.findByUserIdOrderByTriggerAtAsc(userId)
+                    .stream()
+                    .filter(a -> !a.isDismissed() && a.getLabel().toLowerCase().contains(req.alarmId().toLowerCase()))
+                    .toList();
+                if (!matches.isEmpty()) {
+                    AlarmItem alarm = matches.get(0);
+                    alarm.setDismissed(true);
+                    alarmItemRepository.save(alarm);
+                    return "Alarm '" + alarm.getLabel() + "' dismissed.";
+                }
+                return "No active alarm found matching '" + req.alarmId() + "'.";
+            }
         } catch (Exception e) {
             return "Failed to dismiss alarm: " + e.getMessage();
         }
@@ -84,13 +101,18 @@ public class AlarmTool {
                 .withInputType(SetAlarmRequest.class)
                 .build(),
             FunctionCallbackWrapper.builder(this::listActiveAlarms)
+                .withName("listAlarms")
+                .withDescription("Retrieves all alarms from the database (both active and dismissed) with their trigger times and status. Call this tool whenever the user asks to see, check, fetch, or list their alarms.")
+                .withInputType(ListAlarmsRequest.class)
+                .build(),
+            FunctionCallbackWrapper.builder(this::listActiveAlarms)
                 .withName("listActiveAlarms")
-                .withDescription("Lists all active (undismissed) alarms for the user.")
+                .withDescription("Lists all active and configured alarms for the user.")
                 .withInputType(ListAlarmsRequest.class)
                 .build(),
             FunctionCallbackWrapper.builder(this::dismissAlarm)
                 .withName("dismissAlarm")
-                .withDescription("Dismisses (cancels) an alarm by its UUID.")
+                .withDescription("Dismisses (cancels) an alarm by its label/name or UUID.")
                 .withInputType(DismissAlarmRequest.class)
                 .build()
         );

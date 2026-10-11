@@ -12,5 +12,6 @@ public interface TaskItemRepository extends JpaRepository<TaskItem, UUID> {
     List<TaskItem> findByUserIdAndStatusNotOrderByPriorityDescCreatedAtDesc(
         String userId, TaskItem.Status status
     );
+    List<TaskItem> findByUserIdOrderByCreatedAtDesc(String userId);
 }
 

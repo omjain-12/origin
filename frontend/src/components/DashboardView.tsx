@@ -22,6 +22,10 @@ export const DashboardView: React.FC = () => {
 
   useEffect(() => {
     loadData();
+    const interval = setInterval(() => {
+      fetchDashboard().then(setData).catch(() => {});
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const formatDateTime = (isoString?: string) => {

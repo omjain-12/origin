@@ -28,13 +28,13 @@ public class ReminderTool {
 
     public record SetReminderRequest(
         @JsonProperty(required = true) @JsonPropertyDescription("Reminder message text") String message,
-        @JsonProperty(required = true) @JsonPropertyDescription("ISO-8601 datetime when to remind (e.g. 2026-10-15T15:50:00Z)") String remindAt
+        @JsonProperty(required = true) @JsonPropertyDescription("ISO-8601 datetime when to remind (e.g. YYYY-MM-DDTHH:mm:ssZ), calculated relative to current system time") String remindAt
     ) {}
 
     public record ListRemindersRequest() {}
 
     public record CancelReminderRequest(
-        @JsonProperty(required = true) @JsonPropertyDescription("UUID of the reminder to cancel") String reminderId
+        @JsonProperty(required = true) @JsonPropertyDescription("UUID or message/text of the reminder to cancel") String reminderId
     ) {}
 
     public String setReminder(SetReminderRequest req) {
@@ -42,9 +42,9 @@ public class ReminderTool {
             ReminderItem reminder = new ReminderItem();
             reminder.setUserId(userId);
             reminder.setMessage(req.message());
-            reminder.setRemindAt(Instant.parse(req.remindAt()));
+            reminder.setRemindAt(com.origin.util.DateTimeUtil.parseInstant(req.remindAt()));
             ReminderItem saved = reminderItemRepository.save(reminder);
-            return "Reminder set with ID: " + saved.getId() + " for " + saved.getRemindAt();
+            return "Reminder set: '" + saved.getMessage() + "' for " + saved.getRemindAt() + ".";
         } catch (Exception e) {
             return "Failed to set reminder: " + e.getMessage();
         }
@@ -53,10 +53,13 @@ public class ReminderTool {
     public String listActiveReminders(ListRemindersRequest req) {
         try {
             List<ReminderItem> reminders = reminderItemRepository
-                .findByUserIdAndFiredFalseOrderByRemindAtAsc(userId);
-            if (reminders.isEmpty()) return "No active reminders.";
+                .findByUserIdOrderByRemindAtAsc(userId);
+            if (reminders.isEmpty()) return "No reminders found in database.";
             return reminders.stream()
-                .map(r -> "[%s] %s — at %s".formatted(r.getId(), r.getMessage(), r.getRemindAt()))
+                .map(r -> "- Reminder: '%s' scheduled for %s [Status: %s]".formatted(
+                    r.getMessage(),
+                    r.getRemindAt(),
+                    r.isFired() ? "COMPLETED/FIRED" : "PENDING/ACTIVE"))
                 .collect(Collectors.joining("\n"));
         } catch (Exception e) {
             return "Failed to list reminders: " + e.getMessage();
@@ -65,10 +68,23 @@ public class ReminderTool {
 
     public String cancelReminder(CancelReminderRequest req) {
         try {
-            UUID id = UUID.fromString(req.reminderId());
-            if (!reminderItemRepository.existsById(id)) return "No reminder found with ID: " + req.reminderId();
-            reminderItemRepository.deleteById(id);
-            return "Reminder " + req.reminderId() + " cancelled.";
+            try {
+                UUID id = UUID.fromString(req.reminderId());
+                if (!reminderItemRepository.existsById(id)) return "No reminder found with ID: " + req.reminderId();
+                reminderItemRepository.deleteById(id);
+                return "Reminder cancelled successfully.";
+            } catch (IllegalArgumentException notUuid) {
+                List<ReminderItem> matches = reminderItemRepository.findByUserIdOrderByRemindAtAsc(userId)
+                    .stream()
+                    .filter(r -> !r.isFired() && r.getMessage().toLowerCase().contains(req.reminderId().toLowerCase()))
+                    .toList();
+                if (!matches.isEmpty()) {
+                    ReminderItem reminder = matches.get(0);
+                    reminderItemRepository.deleteById(reminder.getId());
+                    return "Reminder '" + reminder.getMessage() + "' cancelled successfully.";
+                }
+                return "No pending reminder found matching '" + req.reminderId() + "'.";
+            }
         } catch (Exception e) {
             return "Failed to cancel reminder: " + e.getMessage();
         }
@@ -82,13 +98,18 @@ public class ReminderTool {
                 .withInputType(SetReminderRequest.class)
                 .build(),
             FunctionCallbackWrapper.builder(this::listActiveReminders)
+                .withName("listReminders")
+                .withDescription("Retrieves all reminders from the database (both active/pending and past/fired). Call this tool whenever the user asks to see, check, fetch, or list reminders.")
+                .withInputType(ListRemindersRequest.class)
+                .build(),
+            FunctionCallbackWrapper.builder(this::listActiveReminders)
                 .withName("listActiveReminders")
                 .withDescription("Lists all active reminders for the user.")
                 .withInputType(ListRemindersRequest.class)
                 .build(),
             FunctionCallbackWrapper.builder(this::cancelReminder)
                 .withName("cancelReminder")
-                .withDescription("Cancels a reminder by its UUID.")
+                .withDescription("Cancels a reminder by its message/text or UUID.")
                 .withInputType(CancelReminderRequest.class)
                 .build()
         );

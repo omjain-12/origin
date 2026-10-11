@@ -43,7 +43,7 @@ public class SchedulerTool {
             job.setCronExpression(req.cronExpression());
             job.setDescription(req.description());
             ScheduledJobItem saved = scheduledJobItemRepository.save(job);
-            return "Job scheduled with ID: " + saved.getId() + " — cron: " + req.cronExpression();
+            return "Recurring job '" + saved.getJobName() + "' scheduled successfully (cron: " + req.cronExpression() + ").";
         } catch (Exception e) {
             return "Failed to schedule job: " + e.getMessage();
         }
@@ -52,10 +52,14 @@ public class SchedulerTool {
     public String listJobs(ListJobsRequest req) {
         try {
             List<ScheduledJobItem> jobs = scheduledJobItemRepository
-                .findByUserIdAndStatusOrderByCreatedAtDesc(userId, ScheduledJobItem.Status.ACTIVE);
-            if (jobs.isEmpty()) return "No active scheduled jobs.";
+                .findByUserIdOrderByCreatedAtDesc(userId);
+            if (jobs.isEmpty()) return "No scheduled jobs found in database.";
             return jobs.stream()
-                .map(j -> "[%s] %s — cron: %s".formatted(j.getId(), j.getJobName(), j.getCronExpression()))
+                .map(j -> "- Job: '%s' (cron: %s, Status: %s)%s".formatted(
+                    j.getJobName(),
+                    j.getCronExpression(),
+                    j.getStatus(),
+                    j.getDescription() != null && !j.getDescription().isBlank() ? " — " + j.getDescription() : ""))
                 .collect(Collectors.joining("\n"));
         } catch (Exception e) {
             return "Failed to list jobs: " + e.getMessage();
@@ -71,7 +75,7 @@ public class SchedulerTool {
                 .build(),
             FunctionCallbackWrapper.builder(this::listJobs)
                 .withName("listJobs")
-                .withDescription("Lists all active scheduled jobs for the user.")
+                .withDescription("Retrieves all recurring and scheduled jobs from the database with their cron expressions and status. Call this tool whenever the user asks to see, check, fetch, or list scheduled jobs.")
                 .withInputType(ListJobsRequest.class)
                 .build()
         );

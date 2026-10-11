@@ -24,8 +24,8 @@ public class UserMemory {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String factText;
 
-    /** 1536-dim embedding from text-embedding-3-small stored as float array via pgvector */
-    @Column(columnDefinition = "vector(1536)")
+    /** 1536-dim embedding stored in pgvector column via native SQL */
+    @Transient
     private float[] embedding;
 
     private String category;

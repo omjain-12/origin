@@ -1,19 +1,38 @@
 import { useState, useRef, useEffect } from 'react';
 import type React from 'react';
-import { Send, Sparkles, User, Bot, RotateCcw, ArrowRight, Clock } from 'lucide-react';
+import { Send, Sparkles, User, Bot, RotateCcw, ArrowRight, Clock, PanelRightClose, PanelRightOpen } from 'lucide-react';
 import type { ChatMessageItem } from '../types';
-import { sendMessage, createSession } from '../api';
+import { sendMessage, createSession, fetchSessionMessages } from '../api';
+import { RightSidebar } from './RightSidebar';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface ChatViewProps {
   sessionId: string;
   onRefreshSession: (newId: string) => void;
   onDataModified?: () => void;
+  onSessionTitleUpdated?: () => void;
 }
 
-export const ChatView: React.FC<ChatViewProps> = ({ sessionId, onRefreshSession, onDataModified }) => {
+export const ChatView: React.FC<ChatViewProps> = ({
+  sessionId,
+  onRefreshSession,
+  onDataModified,
+  onSessionTitleUpdated,
+}) => {
   const [messages, setMessages] = useState<ChatMessageItem[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isRightSidebarOpen, setIsRightSidebarOpen] = useState<boolean>(() => {
+    const saved = localStorage.getItem('origin_right_sidebar_open');
+    return saved !== null ? saved === 'true' : true;
+  });
+  const [sidebarRefreshKey, setSidebarRefreshKey] = useState(0);
+
+  useEffect(() => {
+    localStorage.setItem('origin_right_sidebar_open', String(isRightSidebarOpen));
+  }, [isRightSidebarOpen]);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const quickPrompts = [
@@ -30,6 +49,26 @@ export const ChatView: React.FC<ChatViewProps> = ({ sessionId, onRefreshSession,
   useEffect(() => {
     scrollToBottom();
   }, [messages, loading]);
+
+  // Load message history whenever sessionId changes (or after page refresh)
+  useEffect(() => {
+    if (!sessionId) return;
+    let isMounted = true;
+    const loadHistory = async () => {
+      try {
+        const hist = await fetchSessionMessages(sessionId);
+        if (isMounted) {
+          setMessages(hist);
+        }
+      } catch (err) {
+        console.warn('Could not load history for session', sessionId);
+      }
+    };
+    loadHistory();
+    return () => {
+      isMounted = false;
+    };
+  }, [sessionId]);
 
   const handleSend = async (textToSend?: string) => {
     const text = (textToSend || input).trim();
@@ -55,12 +94,14 @@ export const ChatView: React.FC<ChatViewProps> = ({ sessionId, onRefreshSession,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, assistantMessage]);
+      setSidebarRefreshKey((k) => k + 1);
       if (onDataModified) onDataModified();
+      if (onSessionTitleUpdated) onSessionTitleUpdated();
     } catch (err: any) {
       const errorMessage: ChatMessageItem = {
         id: crypto.randomUUID(),
         role: 'assistant',
-        content: `⚠️ Error: ${err.message || 'Unable to connect to assistant.'}`,
+        content: '⚠️ I encountered an issue connecting to the assistant. Please try again in a moment.',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, errorMessage]);
@@ -89,51 +130,85 @@ export const ChatView: React.FC<ChatViewProps> = ({ sessionId, onRefreshSession,
   return (
     <div style={{
       display: 'flex',
-      flexDirection: 'column',
+      width: '100%',
       height: '100%',
+      overflow: 'hidden',
       backgroundColor: 'var(--bg-app)',
-      position: 'relative'
     }}>
-      {/* Top Header */}
-      <header style={{
-        padding: '16px 28px',
-        borderBottom: '1px solid var(--border)',
+      {/* Main Conversation Column */}
+      <div style={{
+        flex: 1,
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        backgroundColor: 'var(--bg-card)',
-        boxShadow: 'var(--shadow-sm)'
+        flexDirection: 'column',
+        height: '100%',
+        minWidth: 0,
+        position: 'relative',
+        overflow: 'hidden',
       }}>
-        <div>
-          <h2 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-main)' }}>
-            Conversation
-          </h2>
-          <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-            Session ID: {sessionId.substring(0, 8)}...
-          </p>
-        </div>
-        <button
-          onClick={handleNewSession}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            padding: '7px 12px',
-            backgroundColor: 'var(--bg-subtle)',
-            border: '1px solid var(--border)',
-            borderRadius: '8px',
-            color: 'var(--text-secondary)',
-            fontSize: '12px',
-            fontWeight: 500,
-            cursor: 'pointer',
-            transition: 'all 0.15s ease'
-          }}
-          title="Start fresh conversation"
-        >
-          <RotateCcw size={14} />
-          <span>New Chat</span>
-        </button>
-      </header>
+        {/* Top Header */}
+        <header style={{
+          padding: '16px 28px',
+          borderBottom: '1px solid var(--border)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          backgroundColor: 'var(--bg-card)',
+          boxShadow: 'var(--shadow-sm)'
+        }}>
+          <div>
+            <h2 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-main)' }}>
+              Conversation
+            </h2>
+            <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+              Origin Personal Assistant · Active
+            </p>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button
+              onClick={handleNewSession}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '7px 12px',
+                backgroundColor: 'var(--bg-subtle)',
+                border: '1px solid var(--border)',
+                borderRadius: '8px',
+                color: 'var(--text-secondary)',
+                fontSize: '12px',
+                fontWeight: 500,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+              title="Start fresh conversation"
+            >
+              <RotateCcw size={14} />
+              <span>New Chat</span>
+            </button>
+            <button
+              onClick={() => setIsRightSidebarOpen((prev) => !prev)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '7px 12px',
+                backgroundColor: isRightSidebarOpen ? 'var(--accent-light)' : 'var(--bg-subtle)',
+                border: '1px solid',
+                borderColor: isRightSidebarOpen ? 'var(--accent-primary)' : 'var(--border)',
+                borderRadius: '8px',
+                color: isRightSidebarOpen ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                fontSize: '12px',
+                fontWeight: 500,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+              title="Toggle Schedule & Alerts"
+            >
+              {isRightSidebarOpen ? <PanelRightClose size={14} /> : <PanelRightOpen size={14} />}
+              <span>Schedule</span>
+            </button>
+          </div>
+        </header>
 
       {/* Message History & Hero State */}
       <div style={{
@@ -271,10 +346,32 @@ export const ChatView: React.FC<ChatViewProps> = ({ sessionId, onRefreshSession,
                 boxShadow: 'var(--shadow-sm)',
                 lineHeight: 1.6,
                 fontSize: '14px',
-                whiteSpace: 'pre-wrap',
-                wordBreak: 'break-word'
+                whiteSpace: msg.role === 'user' ? 'pre-wrap' : 'normal',
+                wordBreak: 'break-word',
+                minWidth: 0,
+                maxWidth: '100%'
               }}>
-                {msg.content}
+                {msg.role === 'assistant' ? (
+                  <div className="markdown-content">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        table: ({ ...props }) => (
+                          <div style={{ overflowX: 'auto', margin: '10px 0', maxWidth: '100%' }}>
+                            <table {...props} />
+                          </div>
+                        ),
+                        a: ({ ...props }) => (
+                          <a {...props} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-primary)', textDecoration: 'underline' }} />
+                        )
+                      }}
+                    >
+                      {msg.content}
+                    </ReactMarkdown>
+                  </div>
+                ) : (
+                  msg.content
+                )}
                 <div style={{
                   fontSize: '11px',
                   marginTop: '6px',
@@ -416,6 +513,14 @@ export const ChatView: React.FC<ChatViewProps> = ({ sessionId, onRefreshSession,
           Press <kbd style={{ padding: '2px 4px', background: 'var(--bg-subtle)', borderRadius: '4px' }}>Enter</kbd> to send, <kbd style={{ padding: '2px 4px', background: 'var(--bg-subtle)', borderRadius: '4px' }}>Shift + Enter</kbd> for new line
         </div>
       </div>
+      </div>
+
+      {/* Right Sidebar for Schedule, Alarms, Reminders, and Tasks */}
+      <RightSidebar
+        isOpen={isRightSidebarOpen}
+        onToggle={() => setIsRightSidebarOpen((prev) => !prev)}
+        refreshKey={sidebarRefreshKey}
+      />
     </div>
   );
 };

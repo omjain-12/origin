@@ -40,10 +40,10 @@ export const DocumentsView: React.FC = () => {
       {/* Header */}
       <div>
         <h1 style={{ fontSize: '24px', fontWeight: 700, color: 'var(--text-main)', letterSpacing: '-0.3px' }}>
-          Document Knowledge Base (RAG)
+          Knowledge Base
         </h1>
         <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px' }}>
-          Ingest personal notes, policies, or documentation for semantic vector retrieval during conversations.
+          Ingest personal notes, policies, or documentation for intelligent context retrieval during conversations.
         </p>
       </div>
 
@@ -78,7 +78,7 @@ export const DocumentsView: React.FC = () => {
             Upload text or markdown files
           </h3>
           <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
-            Supports .txt and .md files (chunked and vectorized into PostgreSQL pgvector)
+            Supports .txt and .md files (indexed for smart search and conversation context)
           </p>
         </div>
         <label style={{
@@ -93,7 +93,7 @@ export const DocumentsView: React.FC = () => {
           boxShadow: '0 4px 12px rgba(84, 87, 205, 0.25)',
           display: 'inline-block'
         }}>
-          {uploading ? 'Chunking & Embedding...' : 'Choose File to Ingest'}
+          {uploading ? 'Indexing Document...' : 'Choose File to Add'}
           <input
             type="file"
             accept=".txt,.md"
@@ -149,7 +149,7 @@ export const DocumentsView: React.FC = () => {
                       {r.fileName}
                     </div>
                     <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
-                      {r.chunks} semantic chunks generated · Embedded with zai.glm-4.7
+                      Indexed and ready for search across conversations
                     </div>
                   </div>
                 </div>
@@ -174,7 +174,7 @@ export const DocumentsView: React.FC = () => {
           }}>
             <HardDrive size={18} color="var(--text-muted)" />
             <span>
-              Auto-ingestion active on <code>./data/documents/</code>. Any text files placed there are indexed automatically on server startup.
+              Place text or markdown files in your documents directory to index them automatically.
             </span>
           </div>
         )}

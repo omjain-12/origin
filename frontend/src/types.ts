@@ -1,6 +1,8 @@
 export interface ChatSession {
   sessionId: string;
   title: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface ChatMessageItem {

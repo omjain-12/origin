@@ -28,17 +28,18 @@ public class TaskTool {
     public record CreateTaskRequest(
         @JsonProperty(required = true) @JsonPropertyDescription("Task title") String title,
         @JsonPropertyDescription("Optional description") String description,
-        @JsonPropertyDescription("Priority: LOW, MEDIUM, HIGH, or URGENT") String priority
+        @JsonPropertyDescription("Priority: LOW, MEDIUM, HIGH, or URGENT") String priority,
+        @JsonPropertyDescription("Optional ISO-8601 due date/time (e.g. YYYY-MM-DDTHH:mm:ssZ), calculated relative to current system time") String dueDate
     ) {}
 
     public record ListTasksRequest() {}
 
     public record CompleteTaskRequest(
-        @JsonProperty(required = true) @JsonPropertyDescription("UUID of the task to mark completed") String taskId
+        @JsonProperty(required = true) @JsonPropertyDescription("UUID or title/name of the task to mark completed") String taskId
     ) {}
 
     public record DeleteTaskRequest(
-        @JsonProperty(required = true) @JsonPropertyDescription("UUID of the task to delete") String taskId
+        @JsonProperty(required = true) @JsonPropertyDescription("UUID or title/name of the task to delete") String taskId
     ) {}
 
     public String createTask(CreateTaskRequest req) {
@@ -49,8 +50,11 @@ public class TaskTool {
             task.setDescription(req.description());
             String prio = req.priority() != null ? req.priority().toUpperCase() : "MEDIUM";
             task.setPriority(TaskItem.Priority.valueOf(prio));
+            if (req.dueDate() != null && !req.dueDate().isBlank()) {
+                task.setDueDate(com.origin.util.DateTimeUtil.parseInstant(req.dueDate()));
+            }
             TaskItem saved = taskItemRepository.save(task);
-            return "Task created with ID: " + saved.getId() + " — " + saved.getTitle();
+            return "Task created: '" + saved.getTitle() + "' with " + saved.getPriority() + " priority" + (saved.getDueDate() != null ? " (Due: " + saved.getDueDate() + ")" : "") + ".";
         } catch (Exception e) {
             return "Failed to create task: " + e.getMessage();
         }
@@ -59,10 +63,14 @@ public class TaskTool {
     public String listTasks(ListTasksRequest req) {
         try {
             List<TaskItem> tasks = taskItemRepository
-                .findByUserIdAndStatusNotOrderByPriorityDescCreatedAtDesc(userId, TaskItem.Status.CANCELLED);
-            if (tasks.isEmpty()) return "No active tasks found.";
+                .findByUserIdOrderByCreatedAtDesc(userId);
+            if (tasks.isEmpty()) return "No tasks found in database.";
             return tasks.stream()
-                .map(t -> "[%s] [%s] [%s] %s".formatted(t.getId(), t.getPriority(), t.getStatus(), t.getTitle()))
+                .map(t -> "- [%s Priority] %s (Status: %s)%s".formatted(
+                    t.getPriority(),
+                    t.getTitle(),
+                    t.getStatus(),
+                    t.getDescription() != null && !t.getDescription().isBlank() ? " — " + t.getDescription() : ""))
                 .collect(Collectors.joining("\n"));
         } catch (Exception e) {
             return "Failed to list tasks: " + e.getMessage();
@@ -71,12 +79,26 @@ public class TaskTool {
 
     public String completeTask(CompleteTaskRequest req) {
         try {
-            UUID id = UUID.fromString(req.taskId());
-            return taskItemRepository.findById(id).map(task -> {
-                task.setStatus(TaskItem.Status.COMPLETED);
-                taskItemRepository.save(task);
-                return "Task '" + task.getTitle() + "' marked as completed.";
-            }).orElse("No task found with ID: " + req.taskId());
+            try {
+                UUID id = UUID.fromString(req.taskId());
+                return taskItemRepository.findById(id).map(task -> {
+                    task.setStatus(TaskItem.Status.COMPLETED);
+                    taskItemRepository.save(task);
+                    return "Task '" + task.getTitle() + "' marked as completed.";
+                }).orElse("No task found with ID: " + req.taskId());
+            } catch (IllegalArgumentException notUuid) {
+                List<TaskItem> matches = taskItemRepository.findByUserIdOrderByCreatedAtDesc(userId)
+                    .stream()
+                    .filter(t -> t.getTitle().toLowerCase().contains(req.taskId().toLowerCase()))
+                    .toList();
+                if (!matches.isEmpty()) {
+                    TaskItem task = matches.get(0);
+                    task.setStatus(TaskItem.Status.COMPLETED);
+                    taskItemRepository.save(task);
+                    return "Task '" + task.getTitle() + "' marked as completed.";
+                }
+                return "No task found matching '" + req.taskId() + "'.";
+            }
         } catch (Exception e) {
             return "Failed to complete task: " + e.getMessage();
         }
@@ -84,10 +106,23 @@ public class TaskTool {
 
     public String deleteTask(DeleteTaskRequest req) {
         try {
-            UUID id = UUID.fromString(req.taskId());
-            if (!taskItemRepository.existsById(id)) return "No task found with ID: " + req.taskId();
-            taskItemRepository.deleteById(id);
-            return "Task " + req.taskId() + " deleted.";
+            try {
+                UUID id = UUID.fromString(req.taskId());
+                if (!taskItemRepository.existsById(id)) return "No task found with ID: " + req.taskId();
+                taskItemRepository.deleteById(id);
+                return "Task deleted successfully.";
+            } catch (IllegalArgumentException notUuid) {
+                List<TaskItem> matches = taskItemRepository.findByUserIdOrderByCreatedAtDesc(userId)
+                    .stream()
+                    .filter(t -> t.getTitle().toLowerCase().contains(req.taskId().toLowerCase()))
+                    .toList();
+                if (!matches.isEmpty()) {
+                    TaskItem task = matches.get(0);
+                    taskItemRepository.deleteById(task.getId());
+                    return "Task '" + task.getTitle() + "' deleted successfully.";
+                }
+                return "No task found matching '" + req.taskId() + "'.";
+            }
         } catch (Exception e) {
             return "Failed to delete task: " + e.getMessage();
         }
@@ -102,17 +137,17 @@ public class TaskTool {
                 .build(),
             FunctionCallbackWrapper.builder(this::listTasks)
                 .withName("listTasks")
-                .withDescription("Lists all pending and in-progress tasks for the user.")
+                .withDescription("Retrieves all tasks and to-do items from the database (including pending, in-progress, completed, and cancelled) with their priority and status. Call this tool whenever the user asks to see, check, fetch, or list tasks.")
                 .withInputType(ListTasksRequest.class)
                 .build(),
             FunctionCallbackWrapper.builder(this::completeTask)
                 .withName("completeTask")
-                .withDescription("Marks a task as completed by its UUID.")
+                .withDescription("Marks a task as completed by its title/name or UUID.")
                 .withInputType(CompleteTaskRequest.class)
                 .build(),
             FunctionCallbackWrapper.builder(this::deleteTask)
                 .withName("deleteTask")
-                .withDescription("Deletes a task by its UUID.")
+                .withDescription("Deletes a task by its title/name or UUID.")
                 .withInputType(DeleteTaskRequest.class)
                 .build()
         );

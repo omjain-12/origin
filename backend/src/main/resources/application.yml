@@ -21,7 +21,7 @@ spring:
   ai:
     openai:
       api-key: ${API_KEY:ABSKTWFudGxlQXBpS2V5LWVreHAxa2ZmLWF0LTAxNjI2MTM2NDMxNzpWMUpUWk1qYVJNRkVKM2d3L3ZjRkxOR0pDaTJHR1ZBL2R5YXl0OEJXQ1FKYWZsVDBFdTZtQUlWNGNoUT0=}
-      base-url: ${BASE_URL:https://bedrock-mantle.us-east-1.api.aws/v1}
+      base-url: ${BASE_URL:https://bedrock-mantle.us-east-1.api.aws}
       chat:
         options:
           model: ${LLM_MODEL:zai.glm-5}

@@ -38,7 +38,7 @@ public class DashboardController {
     public ResponseEntity<Map<String, Object>> getDashboard() {
         return ResponseEntity.ok(Map.of(
             "upcomingEvents", calendarEventRepository
-                .findByUserIdAndStartTimeAfterOrderByStartTimeAsc(userId, Instant.now()),
+                .findByUserIdOrderByStartTimeDesc(userId),
             "activeTasks", taskItemRepository
                 .findByUserIdAndStatusNotOrderByPriorityDescCreatedAtDesc(userId, TaskItem.Status.CANCELLED),
             "activeReminders", reminderItemRepository
@@ -48,5 +48,36 @@ public class DashboardController {
             "scheduledJobs", scheduledJobItemRepository
                 .findByUserIdAndStatusOrderByCreatedAtDesc(userId, ScheduledJobItem.Status.ACTIVE)
         ));
+    }
+
+    @PatchMapping("/reminders/{id}/dismiss")
+    public ResponseEntity<Void> dismissReminder(@PathVariable("id") java.util.UUID id) {
+        reminderItemRepository.findById(id).ifPresent(r -> {
+            r.setFired(true);
+            reminderItemRepository.save(r);
+        });
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/alarms/{id}/dismiss")
+    public ResponseEntity<Void> dismissAlarm(@PathVariable("id") java.util.UUID id) {
+        alarmItemRepository.findById(id).ifPresent(a -> {
+            a.setDismissed(true);
+            alarmItemRepository.save(a);
+        });
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/tasks/{id}/toggle")
+    public ResponseEntity<Void> toggleTask(@PathVariable("id") java.util.UUID id) {
+        taskItemRepository.findById(id).ifPresent(t -> {
+            if (t.getStatus() == TaskItem.Status.COMPLETED) {
+                t.setStatus(TaskItem.Status.PENDING);
+            } else {
+                t.setStatus(TaskItem.Status.COMPLETED);
+            }
+            taskItemRepository.save(t);
+        });
+        return ResponseEntity.noContent().build();
     }
 }

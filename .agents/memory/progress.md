@@ -36,6 +36,22 @@
   - Editorial SaaS design aesthetic (warm ivory, periwinkle, lavender, sage).
   - `ChatView`, `DashboardView`, `MemoryView`, `DocumentsView`, `Sidebar`.
   - Production build verified (`tsc -b && vite build` succeeded).
+- [x] **Interactive Right Sidebar (Glance & Schedule)**
+  - Dynamic Right Sidebar integrated into `ChatView`.
+  - Collapsible down to 50px icon rail with badge alerts.
+  - Dropdowns for Reminders, Alarms, Tasks, and Calendar Events.
+  - Spotlight countdown card for nearest upcoming items.
+  - Optional quick actions (dismiss alarm/reminder, toggle task completion).
+  - Backend PATCH endpoints added to `DashboardController`.
+- [x] **Shipping Readiness & Human-Centric Abstraction**
+  - Removed Session IDs and raw UUIDs from all views, tool returns, and chat messages.
+  - Natural language identification in tools (`completeTask`, `deleteTask`, `dismissAlarm`, `cancelReminder`, `deleteCalendarEvent`) with automatic title fallback.
+  - Added strict ID-suppression rules to system prompt.
+  - Sanitized backend error handling to prevent Java stack trace leakage.
+  - Polished user-facing terminology in Knowledge Base and Sidebar.
+- [x] **Repository Handover Hygiene**
+  - Gitignore configured for all test scripts, dev notes, root wrappers, and temporary files.
+  - Development prompts and scratch tests untracked from git index while preserved locally.
 
 ### 🔜 Next Up: Phase 8 (Verification)
 - [ ] Start Docker Desktop and run `docker compose up -d`.

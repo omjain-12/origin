@@ -12,5 +12,6 @@ public interface ScheduledJobItemRepository extends JpaRepository<ScheduledJobIt
     List<ScheduledJobItem> findByUserIdAndStatusOrderByCreatedAtDesc(
         String userId, ScheduledJobItem.Status status
     );
+    List<ScheduledJobItem> findByUserIdOrderByCreatedAtDesc(String userId);
 }
 

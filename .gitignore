@@ -29,14 +29,43 @@ dist/
 .cache/
 *.local
 
+# ── Tests, Diagnostics & Scratch ──────────────────────────────────────────────
+test_*.py
+test_*.js
+test_*.ts
+test_*.sh
+test_*.ps1
+TEST_PROMPTS.md
+tests/
+scratch/
+*.scratch.*
+backend/src/test/
+src/test/
+
+# ── Developer Reference & Prompt Notes ────────────────────────────────────────
+refrence_chatgpt_response.txt
+IMPLEMENTATION_PROMPT.md
+PROJECT_PLAN.md
+
+# ── Root Convenience Wrappers ─────────────────────────────────────────────────
+/mvn.cmd
+/mvn.ps1
+
 # ── Environment & Secrets ────────────────────────────────────────────────────
 .env
 .env.*
 !.env.example
 *.key
 *.pem
-*.p12
 secrets/
+*.pyc
+__pycache__/
+
+# ── Temporary & Backups ───────────────────────────────────────────────────────
+*.tmp
+*.temp
+*.bak
+*.swp
 
 # ── Docker ───────────────────────────────────────────────────────────────────
 .dockerignore

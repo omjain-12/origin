@@ -11,6 +11,7 @@ import java.util.UUID;
 @Repository
 public interface ReminderItemRepository extends JpaRepository<ReminderItem, UUID> {
     List<ReminderItem> findByUserIdAndFiredFalseOrderByRemindAtAsc(String userId);
+    List<ReminderItem> findByUserIdOrderByRemindAtAsc(String userId);
     List<ReminderItem> findByFiredFalseAndRemindAtBefore(Instant now);
 }
 

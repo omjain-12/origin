@@ -24,6 +24,32 @@ public class ChatController {
         this.orchestrator = orchestrator;
     }
 
+    @GetMapping("/sessions")
+    public ResponseEntity<?> listSessions() {
+        return ResponseEntity.ok(orchestrator.listSessions().stream().map(s -> Map.of(
+            "sessionId", s.getId().toString(),
+            "title", s.getTitle() != null ? s.getTitle() : "Conversation",
+            "createdAt", s.getCreatedAt() != null ? s.getCreatedAt().toString() : "",
+            "updatedAt", s.getUpdatedAt() != null ? s.getUpdatedAt().toString() : ""
+        )).toList());
+    }
+
+    @GetMapping("/sessions/{sessionId}/messages")
+    public ResponseEntity<?> getSessionMessages(@PathVariable UUID sessionId) {
+        return ResponseEntity.ok(orchestrator.getMessages(sessionId).stream().map(m -> Map.of(
+            "id", m.getId().toString(),
+            "role", m.getRole().name().toLowerCase(),
+            "content", m.getContent(),
+            "createdAt", m.getCreatedAt() != null ? m.getCreatedAt().toString() : ""
+        )).toList());
+    }
+
+    @DeleteMapping("/sessions/{sessionId}")
+    public ResponseEntity<Void> deleteSession(@PathVariable UUID sessionId) {
+        orchestrator.deleteSession(sessionId);
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/session")
     public ResponseEntity<Map<String, String>> createSession() {
         ChatSession session = orchestrator.createSession();
@@ -46,7 +72,8 @@ public class ChatController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("Error processing chat message: {}", e.getMessage(), e);
-            return ResponseEntity.internalServerError().body("Chat error: " + e.getMessage());
+            return ResponseEntity.internalServerError()
+                .body("Origin is temporarily unable to process this request. Please try again in a moment.");
         }
     }
 }

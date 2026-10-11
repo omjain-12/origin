@@ -1,5 +1,6 @@
 import type React from 'react';
-import { MessageSquare, LayoutDashboard, Brain, FileText, Sparkles, Sun, Moon } from 'lucide-react';
+import { MessageSquare, LayoutDashboard, Brain, FileText, Sparkles, Sun, Moon, Plus, Trash2, MessageCircle } from 'lucide-react';
+import type { ChatSession } from '../types';
 
 export type TabType = 'chat' | 'dashboard' | 'memory' | 'documents';
 
@@ -9,6 +10,11 @@ interface SidebarProps {
   online: boolean;
   theme: 'light' | 'dark';
   onToggleTheme: () => void;
+  sessions?: ChatSession[];
+  activeSessionId?: string;
+  onSelectSession?: (id: string) => void;
+  onNewSession?: () => void;
+  onDeleteSession?: (id: string) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -17,6 +23,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
   online,
   theme,
   onToggleTheme,
+  sessions = [],
+  activeSessionId,
+  onSelectSession,
+  onNewSession,
+  onDeleteSession,
 }) => {
   const navItems = [
     { id: 'chat' as TabType, label: 'Assistant', icon: MessageSquare },
@@ -27,20 +38,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <aside style={{
-      width: '260px',
+      width: '280px',
       backgroundColor: 'var(--bg-sidebar)',
       borderRight: '1px solid var(--border)',
       display: 'flex',
       flexDirection: 'column',
-      padding: '24px 16px',
+      padding: '20px 14px',
       justifyContent: 'space-between',
       flexShrink: 0,
       userSelect: 'none',
+      height: '100%',
+      boxSizing: 'border-box',
       transition: 'background-color 0.2s ease, border-color 0.2s ease'
     }}>
-      <div>
+      <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
         {/* Brand */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '32px', paddingLeft: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px', paddingLeft: '8px' }}>
           <div style={{
             width: '38px',
             height: '38px',
@@ -50,7 +63,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             alignItems: 'center',
             justifyContent: 'center',
             boxShadow: '0 4px 12px rgba(84, 87, 205, 0.25)',
-            color: '#fff'
+            color: '#fff',
+            flexShrink: 0
           }}>
             <Sparkles size={20} />
           </div>
@@ -77,7 +91,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Navigation */}
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: '3px', marginBottom: '20px' }}>
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = currentTab === item.id;
@@ -89,26 +103,167 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   gap: '12px',
-                  padding: '11px 14px',
+                  padding: '10px 12px',
                   borderRadius: '10px',
                   border: 'none',
                   backgroundColor: active ? 'var(--bg-card)' : 'transparent',
                   color: active ? 'var(--accent-primary)' : 'var(--text-secondary)',
                   cursor: 'pointer',
                   fontWeight: active ? '600' : '500',
-                  fontSize: '14px',
+                  fontSize: '13.5px',
                   textAlign: 'left',
                   transition: 'all 0.15s ease',
                   boxShadow: active ? 'var(--shadow-sm)' : 'none',
                   borderLeft: active ? '3px solid var(--accent-primary)' : '3px solid transparent'
                 }}
               >
-                <Icon size={18} strokeWidth={active ? 2.3 : 1.8} />
+                <Icon size={17} strokeWidth={active ? 2.3 : 1.8} />
                 <span>{item.label}</span>
               </button>
             );
           })}
         </nav>
+
+        {/* Conversation History Section */}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          borderTop: '1px solid var(--border)',
+          paddingTop: '14px',
+          overflow: 'hidden',
+          flex: 1,
+          minHeight: 0
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '0 8px 8px 8px'
+          }}>
+            <span style={{
+              fontSize: '11px',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.6px',
+              color: 'var(--text-muted)'
+            }}>
+              Conversations
+            </span>
+            {onNewSession && (
+              <button
+                onClick={onNewSession}
+                title="New Chat"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  background: 'none',
+                  border: '1px solid var(--border)',
+                  borderRadius: '6px',
+                  padding: '3px 8px',
+                  fontSize: '11px',
+                  fontWeight: 500,
+                  color: 'var(--accent-primary)',
+                  cursor: 'pointer',
+                  backgroundColor: 'var(--bg-card)'
+                }}
+              >
+                <Plus size={12} />
+                <span>New</span>
+              </button>
+            )}
+          </div>
+
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '2px',
+            overflowY: 'auto',
+            paddingRight: '4px'
+          }}>
+            {sessions.length === 0 ? (
+              <p style={{
+                fontSize: '12px',
+                color: 'var(--text-muted)',
+                fontStyle: 'italic',
+                padding: '8px'
+              }}>
+                No saved chats yet.
+              </p>
+            ) : (
+              sessions.map((sess) => {
+                const isActive = sess.sessionId === activeSessionId;
+                return (
+                  <div
+                    key={sess.sessionId}
+                    onClick={() => {
+                      if (onSelectSession) onSelectSession(sess.sessionId);
+                      onSelectTab('chat');
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '8px 10px',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      fontSize: '12.5px',
+                      backgroundColor: isActive ? 'var(--bg-card)' : 'transparent',
+                      color: isActive ? 'var(--text-main)' : 'var(--text-secondary)',
+                      fontWeight: isActive ? 600 : 400,
+                      boxShadow: isActive ? 'var(--shadow-sm)' : 'none',
+                      borderLeft: isActive ? '2px solid var(--accent-primary)' : '2px solid transparent',
+                      transition: 'all 0.12s ease'
+                    }}
+                  >
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      flex: 1
+                    }}>
+                      <MessageCircle size={14} color={isActive ? 'var(--accent-primary)' : 'var(--text-muted)'} style={{ flexShrink: 0 }} />
+                      <span style={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
+                      }}>
+                        {sess.title || 'Conversation'}
+                      </span>
+                    </div>
+
+                    {onDeleteSession && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDeleteSession(sess.sessionId);
+                        }}
+                        title="Delete Chat"
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          padding: '2px',
+                          color: 'var(--text-muted)',
+                          cursor: 'pointer',
+                          opacity: 0.6,
+                          display: 'flex',
+                          alignItems: 'center'
+                        }}
+                        onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.opacity = '1')}
+                        onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.opacity = '0.6')}
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Footer controls: Theme toggle + System status */}
@@ -158,11 +313,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
               boxShadow: online ? '0 0 8px rgba(16, 185, 129, 0.5)' : 'none'
             }} />
             <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-main)' }}>
-              {online ? 'Engine Connected' : 'Engine Idle'}
+              {online ? 'Origin Online' : 'Origin Idle'}
             </span>
           </div>
           <p style={{ fontSize: '11px', color: 'var(--text-muted)', lineHeight: '1.4' }}>
-            zai.glm-5 · Bedrock Mantle
+            Autonomous Assistant Ready
           </p>
         </div>
       </div>

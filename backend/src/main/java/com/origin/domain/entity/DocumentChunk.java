@@ -21,7 +21,7 @@ public class DocumentChunk {
 
     private int chunkIndex;
 
-    @Column(columnDefinition = "vector(1536)")
+    @Transient
     private float[] embedding;
 
     public DocumentChunk() {}

@@ -27,6 +27,7 @@ public class DocumentIngestionService {
     private final EmbeddingModel embeddingModel;
     private final DocumentChunkRepository documentChunkRepository;
     private final EntityManager entityManager;
+    private final org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
 
     @Value("${Origin.documents.scan-directory:./data/documents}")
     private String scanDirectory;
@@ -39,10 +40,12 @@ public class DocumentIngestionService {
 
     public DocumentIngestionService(EmbeddingModel embeddingModel,
                                     DocumentChunkRepository documentChunkRepository,
-                                    EntityManager entityManager) {
+                                    EntityManager entityManager,
+                                    org.springframework.jdbc.core.JdbcTemplate jdbcTemplate) {
         this.embeddingModel = embeddingModel;
         this.documentChunkRepository = documentChunkRepository;
         this.entityManager = entityManager;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @PostConstruct
@@ -93,7 +96,13 @@ public class DocumentIngestionService {
                 chunk.setContent(chunkText);
                 chunk.setChunkIndex(idx++);
                 chunk.setEmbedding(embedding);
-                documentChunkRepository.save(chunk);
+                DocumentChunk savedChunk = documentChunkRepository.save(chunk);
+                try {
+                    String embeddingStr = VectorRetrievalService.floatArrayToVectorString(embedding);
+                    jdbcTemplate.update("UPDATE document_chunks SET embedding = CAST(? AS vector) WHERE id = ?", embeddingStr, savedChunk.getId());
+                } catch (Exception ex) {
+                    log.warn("Could not update vector embedding for chunk {}: {}", savedChunk.getId(), ex.getMessage());
+                }
             } catch (Exception e) {
                 log.error("Embedding failed for chunk {} of {}: {}", idx, fileName, e.getMessage());
             }

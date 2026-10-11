@@ -17,6 +17,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -72,20 +75,33 @@ public class AgentOrchestratorService {
 
     private static final String SYSTEM_PROMPT = """
         You are Origin, a proactive and intelligent personal AI assistant. You have access to the
-        user's calendar, tasks, reminders, alarms, and scheduled jobs. Use tools actively when the
-        user asks to schedule, remind, create, or manage items.
-        
+        user's calendar, tasks, reminders, alarms, and scheduled jobs.
+
+        ## Current Temporal Context:
+        - Current system datetime: {current_time}
+        - Current day of the week: {day_of_week}
+        - When the user asks to schedule, remind, or create items relative to now (e.g. 'in 30 minutes', 'tomorrow at 9 AM', 'this Thursday', 'today at 4 PM'), you MUST calculate the target ISO-8601 datetime relative to the current system datetime above.
+
+        ## Critical Instructions on Database Tools vs Memory:
+        - Alarms, reminders, calendar events, tasks, and scheduled jobs are stored in the database, NOT in the memory context or document context below.
+        - Whenever the user asks to check, list, view, fetch, or inquire about their reminders, alarms, schedule/calendar, tasks, or jobs (e.g. 'what are my reminders?', 'fetch all alarms', 'show my schedule', 'what tasks do I have?'), you MUST invoke the corresponding tool (`listReminders`, `listAlarms`, `listCalendarEvents`, `listTasks`, `listJobs`) to query the database.
+        - NEVER assume or answer that there are no items based solely on empty vector memory or document context without executing the tool first.
+        - When the user asks to schedule, remind, create, complete, or delete items, actively invoke the appropriate tools.
+
+        ## User Interaction & Privacy Directives:
+        - NEVER expose internal database IDs, UUIDs, session IDs, or technical identifiers to the user in your responses. Always refer to items naturally by their title, label, or time (e.g. 'Buy groceries', 'your 7 AM alarm', 'team sync at 3 PM').
+        - Never ask the user to provide a UUID or technical ID to complete, delete, or dismiss items. Use the title or message when invoking tools.
+        - When confirming actions, confirm clearly and conversationally (e.g. "I've added 'Buy groceries' to your tasks with High priority." or "I've set an alarm for 7:00 AM.").
+
         ## Relevant User Context (from memory):
         {memories}
-        
+
         ## Relevant Document Context (from knowledge base):
         {rag_context}
-        
-        Always be concise, helpful, and proactive. When you create or modify something, confirm
-        what was done. Respect the user's stated preferences.
+
+        Always be concise, helpful, and proactive. When presenting items from tools, format them cleanly using Markdown. When you create or modify something, confirm what was done. Respect the user's stated preferences.
         """;
 
-    @Transactional
     public String chat(UUID sessionId, String userInput) {
         ChatSession session = sessionRepository.findById(sessionId)
             .orElseThrow(() -> new IllegalArgumentException("Session not found: " + sessionId));
@@ -101,8 +117,15 @@ public class AgentOrchestratorService {
         String ragContext = vectorRetrievalService.retrieveContext(expandedQueries);
 
         // 3. Build conversation history
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.systemDefault());
+        String currentTime = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX"))
+            + " (" + now.format(DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy h:mm a")) + ")";
+        String dayOfWeek = now.getDayOfWeek().toString();
+
         List<Message> messages = new ArrayList<>();
         messages.add(new SystemMessage(SYSTEM_PROMPT
+            .replace("{current_time}", currentTime)
+            .replace("{day_of_week}", dayOfWeek)
             .replace("{memories}", memoriesText.isBlank() ? "None yet." : memoriesText)
             .replace("{rag_context}", ragContext.isBlank() ? "No relevant documents found." : ragContext)));
 
@@ -153,6 +176,13 @@ public class AgentOrchestratorService {
             log.warn("Learning layer failed silently: {}", e.getMessage());
         }
 
+        // Update title if it is default
+        if ("New Conversation".equals(session.getTitle()) && !userInput.isBlank()) {
+            String newTitle = userInput.length() > 36 ? userInput.substring(0, 36) + "..." : userInput;
+            session.setTitle(newTitle);
+            sessionRepository.save(session);
+        }
+
         return assistantResponse;
     }
 
@@ -162,5 +192,18 @@ public class AgentOrchestratorService {
         session.setUserId(userId);
         session.setTitle("New Conversation");
         return sessionRepository.save(session);
+    }
+
+    public List<ChatSession> listSessions() {
+        return sessionRepository.findByUserIdOrderByUpdatedAtDesc(userId);
+    }
+
+    public List<ChatMessage> getMessages(UUID sessionId) {
+        return messageRepository.findBySessionIdOrderByCreatedAtAsc(sessionId);
+    }
+
+    @Transactional
+    public void deleteSession(UUID sessionId) {
+        sessionRepository.deleteById(sessionId);
     }
 }

@@ -36,6 +36,9 @@ public class VectorRetrievalService {
      * deduplicates by chunk ID, and returns concatenated context text.
      */
     public String retrieveContext(List<String> queries) {
+        if (queries == null || queries.isEmpty() || documentChunkRepository.count() == 0) {
+            return "";
+        }
         Set<UUID> seen = new LinkedHashSet<>();
         List<DocumentChunk> allChunks = new ArrayList<>();
 

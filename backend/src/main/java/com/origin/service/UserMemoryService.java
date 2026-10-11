@@ -18,17 +18,22 @@ public class UserMemoryService {
 
     private final UserMemoryRepository userMemoryRepository;
     private final EmbeddingModel embeddingModel;
+    private final org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
 
     @Value("${Origin.memory.user-id:default-user}")
     private String userId;
 
-    public UserMemoryService(UserMemoryRepository userMemoryRepository, EmbeddingModel embeddingModel) {
+    public UserMemoryService(UserMemoryRepository userMemoryRepository, EmbeddingModel embeddingModel, org.springframework.jdbc.core.JdbcTemplate jdbcTemplate) {
         this.userMemoryRepository = userMemoryRepository;
         this.embeddingModel = embeddingModel;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     public List<UserMemory> findRelevantMemories(String query, int topK) {
         try {
+            if (userMemoryRepository.count() == 0) {
+                return List.of();
+            }
             float[] embedding = embeddingModel.embed(query);
             String embeddingStr = VectorRetrievalService.floatArrayToVectorString(embedding);
             return userMemoryRepository.findTopKBySemanticSimilarity(userId, embeddingStr, topK);
@@ -46,7 +51,14 @@ public class UserMemoryService {
             memory.setFactText(factText);
             memory.setEmbedding(embedding);
             memory.setCategory(category);
-            return userMemoryRepository.save(memory);
+            UserMemory saved = userMemoryRepository.save(memory);
+            try {
+                String embeddingStr = VectorRetrievalService.floatArrayToVectorString(embedding);
+                jdbcTemplate.update("UPDATE user_memories SET embedding = CAST(? AS vector) WHERE id = ?", embeddingStr, saved.getId());
+            } catch (Exception ex) {
+                log.warn("Could not update vector embedding for memory {}: {}", saved.getId(), ex.getMessage());
+            }
+            return saved;
         } catch (Exception e) {
             log.error("Failed to save memory: {}", e.getMessage());
             throw new RuntimeException("Memory persistence failed", e);
